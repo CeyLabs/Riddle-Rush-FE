@@ -37,7 +37,7 @@ export function CampaignGrid() {
   const setViewMode = useAppStore((state) => state.setViewMode);
 
   const filteredCampaigns = campaigns.filter((campaign) =>
-    campaign.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    campaign.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const isBlockchainProject = (name: string) => {
@@ -51,7 +51,7 @@ export function CampaignGrid() {
       "web3",
     ];
     return blockchainKeywords.some((keyword) =>
-      name.toLowerCase().includes(keyword),
+      name.toLowerCase().includes(keyword)
     );
   };
 
@@ -67,7 +67,7 @@ export function CampaignGrid() {
       <CardContent>
         <div className="flex items-center justify-between">
           <Skeleton className="h-4 w-20" />
-          <Skeleton className="h-4 w-4" />
+          <Skeleton className="size-4" />
         </div>
       </CardContent>
     </Card>
@@ -93,7 +93,7 @@ export function CampaignGrid() {
       <div className="space-y-6">
         <div className="flex items-center space-x-4">
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground size-4" />
             <Input
               placeholder="Search campaigns..."
               className="pl-10"
@@ -106,14 +106,14 @@ export function CampaignGrid() {
               size="sm"
               className="bg-primary hover:bg-primary/90 text-black rounded-r-none border-r-0"
             >
-              <Grid3X3 className="w-4 h-4" />
+              <Grid3X3 className="size-4" />
             </Button>
             <Button
               variant="outline"
               size="sm"
               className="bg-primary hover:bg-primary/90 text-black rounded-l-none"
             >
-              <List className="w-4 h-4" />
+              <List className="size-4" />
             </Button>
           </div>
         </div>
@@ -139,7 +139,7 @@ export function CampaignGrid() {
       {/* Search and View Toggle */}
       <div className="flex items-center justify-between">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground size-4" />
           <Input
             placeholder="Search campaigns..."
             value={searchTerm}
@@ -158,7 +158,7 @@ export function CampaignGrid() {
                 : ""
             }`}
           >
-            <Grid3X3 className="w-4 h-4" />
+            <Grid3X3 className="size-4" />
           </Button>
           <Button
             variant={viewMode === "list" ? "default" : "outline"}
@@ -170,7 +170,7 @@ export function CampaignGrid() {
                 : ""
             }`}
           >
-            <List className="w-4 h-4" />
+            <List className="size-4" />
           </Button>
         </div>
       </div>
@@ -190,9 +190,6 @@ export function CampaignGrid() {
                 <h3 className="font-semibold text-foreground group-hover:text-gray-900 dark:group-hover:text-gray-100 transition-colors duration-200">
                   Create New Campaign
                 </h3>
-                <p className="text-sm text-muted-foreground group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-200">
-                  Start building your riddle collection
-                </p>
               </div>
             </CardContent>
           </Card>
@@ -207,15 +204,15 @@ export function CampaignGrid() {
                         {campaign.name}
                       </CardTitle>
                       {isBlockchainProject(campaign.name) && (
-                        <Bitcoin className="w-4 h-4 text-primary" />
+                        <Bitcoin className="size-4 text-primary" />
                       )}
                     </div>
                     <Badge
                       variant="secondary"
                       className={`${getStatusColor(
-                        campaign.status,
+                        campaign.status
                       )} ${getStatusTextColor(
-                        campaign.status,
+                        campaign.status
                       )} transition-colors duration-200`}
                     >
                       {campaign.status}
@@ -223,7 +220,7 @@ export function CampaignGrid() {
                   </div>
                   <CardDescription className="flex items-center space-x-4 text-sm">
                     <span className="flex items-center space-x-1">
-                      <Calendar className="w-4 h-4" />
+                      <Calendar className="size-4" />
                       <span>{formatDate(campaign.createdAt)}</span>
                     </span>
                   </CardDescription>
@@ -231,10 +228,10 @@ export function CampaignGrid() {
                 <CardContent>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground flex items-center space-x-1">
-                      <FileText className="w-4 h-4" />
+                      <FileText className="size-4" />
                       <span>{campaign.questionCount} questions</span>
                     </span>
-                    <Clock className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors duration-200" />
+                    <Clock className="size-4 text-muted-foreground group-hover:text-primary transition-colors duration-200" />
                   </div>
                 </CardContent>
               </Card>
@@ -255,9 +252,6 @@ export function CampaignGrid() {
                 <h3 className="font-semibold text-foreground group-hover:text-gray-900 dark:group-hover:text-gray-100 transition-colors duration-200">
                   Create New Campaign
                 </h3>
-                <p className="text-sm text-muted-foreground group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-200">
-                  Start building your riddle collection
-                </p>
               </div>
             </div>
           </Card>
@@ -272,15 +266,15 @@ export function CampaignGrid() {
                         {campaign.name}
                       </h3>
                       {isBlockchainProject(campaign.name) && (
-                        <Bitcoin className="w-4 h-4 text-primary" />
+                        <Bitcoin className="size-4 text-primary" />
                       )}
                     </div>
                     <Badge
                       variant="secondary"
                       className={`${getStatusColor(
-                        campaign.status,
+                        campaign.status
                       )} ${getStatusTextColor(
-                        campaign.status,
+                        campaign.status
                       )} transition-colors duration-200`}
                     >
                       {campaign.status}
@@ -288,14 +282,14 @@ export function CampaignGrid() {
                   </div>
                   <div className="flex items-center space-x-6 text-sm text-muted-foreground">
                     <span className="flex items-center space-x-1">
-                      <Calendar className="w-4 h-4" />
+                      <Calendar className="size-4" />
                       <span>{formatDate(campaign.createdAt)}</span>
                     </span>
                     <span className="flex items-center space-x-1">
-                      <FileText className="w-4 h-4" />
+                      <FileText className="size-4" />
                       <span>{campaign.questionCount} questions</span>
                     </span>
-                    <Trophy className="w-4 h-4 group-hover:text-primary transition-colors duration-200" />
+                    <Trophy className="size-4 group-hover:text-primary transition-colors duration-200" />
                   </div>
                 </div>
               </Card>

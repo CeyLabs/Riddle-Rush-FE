@@ -79,15 +79,11 @@ export function CreateCampaignDialog({
           <DialogHeader>
             <DialogTitle>Create New Campaign</DialogTitle>
             <DialogDescription>
-              Give your riddle campaign a name to get started.
+              Give the riddle campaign a name to get started.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Name
-              </Label>
-              <div className="col-span-3 space-y-2">
+          <div className="grid gap-4 py-8">
+              <div>
                 <Input
                   id="name"
                   placeholder="Enter campaign name..."
@@ -104,7 +100,6 @@ export function CreateCampaignDialog({
                   </p>
                 )}
               </div>
-            </div>
           </div>
           <DialogFooter>
             <Button
@@ -118,11 +113,11 @@ export function CreateCampaignDialog({
             <Button
               type="submit"
               disabled={isLoading}
-              className="bg-primary text-black hover:bg-primary/90 transition-all duration-200 hover:scale-105 disabled:hover:scale-100"
+              className="bg-primary text-black hover:bg-primary/90 transition-all duration-200"
             >
               {isLoading ? (
                 <div className="flex items-center space-x-2">
-                  <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                  <div className="size-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
                   <span>Creating...</span>
                 </div>
               ) : (

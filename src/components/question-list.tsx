@@ -38,7 +38,7 @@ export function QuestionList({ campaignId }: QuestionListProps) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [deletingQuestion, setDeletingQuestion] = useState<Question | null>(
-    null,
+    null
   );
   const [isLoading, setIsLoading] = useState(true);
 
@@ -62,18 +62,18 @@ export function QuestionList({ campaignId }: QuestionListProps) {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "active":
-        return <Clock className="w-4 h-4" />;
+        return <Clock className="size-4" />;
       case "upcoming":
-        return <AlertCircle className="w-4 h-4" />;
+        return <AlertCircle className="size-4" />;
       case "ended":
-        return <CheckCircle className="w-4 h-4" />;
+        return <CheckCircle className="size-4" />;
       default:
-        return <Clock className="w-4 h-4" />;
+        return <Clock className="size-4" />;
     }
   };
 
   const handleAddQuestion = (
-    newQuestion: Omit<Question, "id" | "status" | "campaignId">,
+    newQuestion: Omit<Question, "id" | "status" | "campaignId">
   ) => {
     addQuestion({ ...newQuestion, campaignId });
   };
@@ -162,7 +162,7 @@ export function QuestionList({ campaignId }: QuestionListProps) {
           onClick={() => setIsAddDialogOpen(true)}
           className="bg-primary text-black hover:bg-primary/90 transition-all duration-200 hover:scale-105"
         >
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="size-4 mr-2" />
           Add Question
         </Button>
       </div>
@@ -219,9 +219,9 @@ export function QuestionList({ campaignId }: QuestionListProps) {
                       <Badge
                         variant="secondary"
                         className={`${getStatusColor(
-                          question.status,
+                          question.status
                         )} ${getStatusTextColor(
-                          question.status,
+                          question.status
                         )} text-xs transition-colors duration-200`}
                       >
                         <span className="flex items-center space-x-1">
@@ -238,7 +238,7 @@ export function QuestionList({ campaignId }: QuestionListProps) {
                       onClick={() => setEditingQuestion(question)}
                       className="h-8 w-8 p-0 hover:bg-primary/10 hover:text-primary transition-all duration-200"
                     >
-                      <Edit className="w-4 h-4" />
+                      <Edit className="size-4" />
                     </Button>
                     <Button
                       variant="ghost"
@@ -246,7 +246,7 @@ export function QuestionList({ campaignId }: QuestionListProps) {
                       onClick={() => setDeletingQuestion(question)}
                       className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10 transition-all duration-200"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="size-4" />
                     </Button>
                   </div>
                 </div>

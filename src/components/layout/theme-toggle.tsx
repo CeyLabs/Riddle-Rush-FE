@@ -25,9 +25,9 @@ export function ThemeToggle() {
       className="w-9 h-9 p-0 hover:bg-primary/10 hover:text-primary transition-all duration-200"
     >
       {theme === "light" ? (
-        <Moon className="h-4 w-4" />
+        <Moon className="size-4" />
       ) : (
-        <Sun className="h-4 w-4" />
+        <Sun className="size-4" />
       )}
       <span className="sr-only">Toggle theme</span>
     </Button>
