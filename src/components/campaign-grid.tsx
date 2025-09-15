@@ -177,9 +177,9 @@ export function CampaignGrid() {
 
       {/* Campaigns Display */}
       {viewMode === "grid" ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           <Card
-            className="border-dashed border-2 border-primary cursor-pointer transition-all duration-200 hover:scale-105 h-48 group"
+            className="border-dashed border-2 border-primary cursor-pointer transition-all duration-200 h-48 group"
             onClick={() => setIsCreateDialogOpen(true)}
           >
             <CardContent className="flex flex-col items-center justify-center h-full space-y-4">
@@ -199,7 +199,7 @@ export function CampaignGrid() {
 
           {filteredCampaigns.map((campaign) => (
             <Link key={campaign.id} href={`/campaign/${campaign.id}`}>
-              <Card className="hover:shadow-lg transition-all duration-200 cursor-pointer h-48 hover:scale-105 group">
+              <Card className="hover:shadow-lg transition-all duration-200 cursor-pointer h-48 group">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">

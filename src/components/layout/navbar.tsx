@@ -7,8 +7,8 @@ export function Navbar() {
     <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 py-2 flex items-center justify-between">
         <Link href="/" className="flex items-center space-x-2 group">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center transition-transform duration-200 group-hover:scale-110">
-            <span className="text-black font-bold text-lg">R</span>
+          <div className="w-8 h-8 bg-secondary rounded-lg flex items-center justify-center">
+            <span className="font-bold text-lg">R</span>
           </div>
           <span className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors duration-200">
             RiddleRush
