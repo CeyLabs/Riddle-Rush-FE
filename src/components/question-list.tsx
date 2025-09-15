@@ -1,0 +1,265 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Plus, Edit, Trash2, Clock, CheckCircle, AlertCircle } from "lucide-react"
+import { AddQuestionDialog } from "@/components/add-question-dialog"
+import { EditQuestionDialog } from "@/components/edit-question-dialog"
+import { DeleteQuestionDialog } from "@/components/delete-question-dialog"
+import { useAppStore } from "@/lib/store"
+import { formatDate, getStatusColor, getStatusTextColor } from "@/lib/utils"
+
+interface Question {
+  id: string
+  campaignId: string
+  question: string
+  answerType: "static" | "ai-validated"
+  answer: string
+  startTime: string
+  endTime: string
+  status: "upcoming" | "active" | "ended"
+}
+
+interface QuestionListProps {
+  campaignId: string
+}
+
+export function QuestionList({ campaignId }: QuestionListProps) {
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [editingQuestion, setEditingQuestion] = useState<Question | null>(null)
+  const [deletingQuestion, setDeletingQuestion] = useState<Question | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  const { questions, addQuestion, updateQuestion, deleteQuestion, getCampaignQuestions } = useAppStore()
+  const campaignQuestions = getCampaignQuestions(campaignId)
+
+  useEffect(() => {
+    console.log("[v0] Campaign ID:", campaignId)
+    console.log("[v0] All questions:", questions)
+    console.log("[v0] Campaign questions:", campaignQuestions)
+    const timer = setTimeout(() => setIsLoading(false), 1000)
+    return () => clearTimeout(timer)
+  }, [campaignId, questions, campaignQuestions])
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "active":
+        return <Clock className="w-4 h-4" />
+      case "upcoming":
+        return <AlertCircle className="w-4 h-4" />
+      case "ended":
+        return <CheckCircle className="w-4 h-4" />
+      default:
+        return <Clock className="w-4 h-4" />
+    }
+  }
+
+  const handleAddQuestion = (newQuestion: Omit<Question, "id" | "status" | "campaignId">) => {
+    addQuestion({ ...newQuestion, campaignId })
+  }
+
+  const handleEditQuestion = (updatedQuestion: Question) => {
+    updateQuestion(updatedQuestion.id, updatedQuestion)
+    setEditingQuestion(null)
+  }
+
+  const handleDeleteQuestion = (questionId: string) => {
+    deleteQuestion(questionId)
+    setDeletingQuestion(null)
+  }
+
+  const formatDateTime = (dateString: string) => {
+    const date = new Date(dateString)
+    const formattedDate = formatDate(dateString)
+    const time = date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    return `${formattedDate} at ${time}`
+  }
+
+  const QuestionSkeleton = () => (
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between">
+          <div className="space-y-2 flex-1">
+            <Skeleton className="h-6 w-full" />
+            <Skeleton className="h-6 w-3/4" />
+            <div className="flex items-center space-x-4">
+              <Skeleton className="h-5 w-20" />
+              <Skeleton className="h-5 w-16" />
+            </div>
+          </div>
+          <div className="flex items-center space-x-2 ml-4">
+            <Skeleton className="h-8 w-8" />
+            <Skeleton className="h-8 w-8" />
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <div className="space-y-3">
+          <div>
+            <Skeleton className="h-4 w-16 mb-1" />
+            <Skeleton className="h-16 w-full" />
+          </div>
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-3 w-32" />
+            <Skeleton className="h-3 w-32" />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <Skeleton className="h-8 w-32 mb-2" />
+            <Skeleton className="h-4 w-64" />
+          </div>
+          <Skeleton className="h-10 w-32" />
+        </div>
+        <div className="grid gap-4">
+          <QuestionSkeleton />
+          <QuestionSkeleton />
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-semibold text-foreground">Questions</h2>
+          <p className="text-muted-foreground">Manage your riddle questions and their schedules</p>
+        </div>
+        <Button
+          onClick={() => setIsAddDialogOpen(true)}
+          className="bg-binance-yellow text-black hover:bg-binance-yellow/90 transition-all duration-200 hover:scale-105"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Add Question
+        </Button>
+      </div>
+
+      {campaignQuestions.length === 0 ? (
+        <Card className="border-dashed border-2 hover:border-binance-yellow/50 transition-colors duration-200">
+          <CardContent className="flex flex-col items-center justify-center py-12 space-y-4">
+            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
+              <Plus className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <div className="text-center">
+              <h3 className="font-semibold text-foreground">No questions yet</h3>
+              <p className="text-sm text-muted-foreground">Add your first riddle question to get started</p>
+            </div>
+            <Button
+              onClick={() => setIsAddDialogOpen(true)}
+              className="bg-binance-yellow text-black hover:bg-binance-yellow/90 transition-all duration-200 hover:scale-105"
+            >
+              Add Question
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-4">
+          {campaignQuestions.map((question, index) => (
+            <Card key={question.id} className="hover:shadow-lg transition-all duration-200 hover:scale-[1.02] group">
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-2 flex-1">
+                    <div className="flex items-start space-x-3">
+                      <Badge
+                        variant="outline"
+                        className="text-xs font-mono bg-binance-yellow/10 text-binance-yellow border-binance-yellow/30"
+                      >
+                        Q{index + 1}
+                      </Badge>
+                      <CardTitle className="text-lg leading-relaxed group-hover:text-binance-yellow transition-colors duration-200 flex-1">
+                        {question.question}
+                      </CardTitle>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2 ml-12">
+                      <Badge variant="outline" className="text-xs">
+                        {question.answerType === "static" ? "Static Answer" : "AI Validated"}
+                      </Badge>
+                      <Badge
+                        variant="secondary"
+                        className={`${getStatusColor(question.status)} ${getStatusTextColor(question.status)} text-xs transition-colors duration-200`}
+                      >
+                        <span className="flex items-center space-x-1">
+                          {getStatusIcon(question.status)}
+                          <span className="capitalize">{question.status}</span>
+                        </span>
+                      </Badge>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2 ml-4">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setEditingQuestion(question)}
+                      className="h-8 w-8 p-0 hover:bg-binance-yellow/10 hover:text-binance-yellow transition-all duration-200"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setDeletingQuestion(question)}
+                      className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10 transition-all duration-200"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="space-y-3">
+                  <div className="ml-12">
+                    <p className="text-sm font-medium text-foreground mb-1">Answer:</p>
+                    <p className="text-sm text-muted-foreground bg-muted p-3 rounded-lg border-l-4 border-binance-yellow/30">
+                      {question.answer}
+                    </p>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-muted-foreground ml-12">
+                    <span className="flex items-center space-x-1">
+                      <Clock className="w-3 h-3" />
+                      <span>Start: {formatDateTime(question.startTime)}</span>
+                    </span>
+                    <span className="flex items-center space-x-1">
+                      <CheckCircle className="w-3 h-3" />
+                      <span>End: {formatDateTime(question.endTime)}</span>
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      <AddQuestionDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} onAddQuestion={handleAddQuestion} />
+
+      {editingQuestion && (
+        <EditQuestionDialog
+          question={editingQuestion}
+          open={!!editingQuestion}
+          onOpenChange={(open) => !open && setEditingQuestion(null)}
+          onEditQuestion={handleEditQuestion}
+        />
+      )}
+
+      {deletingQuestion && (
+        <DeleteQuestionDialog
+          question={deletingQuestion}
+          open={!!deletingQuestion}
+          onOpenChange={(open) => !open && setDeletingQuestion(null)}
+          onDeleteQuestion={handleDeleteQuestion}
+        />
+      )}
+    </div>
+  )
+}
