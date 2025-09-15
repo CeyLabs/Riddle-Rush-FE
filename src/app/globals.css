@@ -162,7 +162,7 @@
   --sidebar-border: oklch(0.3107 0.0166 255.6442);
   --sidebar-ring: oklch(0.8132 0.1649 86.6888);
   --destructive-foreground: oklch(0.2183 0.0121 270.8076);
-  --radius: 0.3rem;
+  --radius: 0.5rem;
   --font-sans: Inter;
   --font-serif: serif;
   --font-mono: monospace;
