@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useForm, Controller } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -11,31 +11,35 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { DateTimePicker } from "@/components/ui/date-time-picker"
-import { questionSchema, type QuestionFormData } from "@/lib/validations"
-import { toast } from "sonner"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { DateTimePicker } from "@/components/ui/date-time-picker";
+import { questionSchema, type QuestionFormData } from "@/lib/validations";
+import { toast } from "sonner";
 
 interface Question {
-  question: string
-  answerType: "static" | "ai-validated"
-  answer: string
-  startTime: string
-  endTime: string
+  question: string;
+  answerType: "static" | "ai-validated";
+  answer: string;
+  startTime: string;
+  endTime: string;
 }
 
 interface AddQuestionDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onAddQuestion: (question: Question) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onAddQuestion: (question: Question) => void;
 }
 
-export function AddQuestionDialog({ open, onOpenChange, onAddQuestion }: AddQuestionDialogProps) {
-  const [isLoading, setIsLoading] = useState(false)
+export function AddQuestionDialog({
+  open,
+  onOpenChange,
+  onAddQuestion,
+}: AddQuestionDialogProps) {
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
@@ -50,34 +54,34 @@ export function AddQuestionDialog({ open, onOpenChange, onAddQuestion }: AddQues
     defaultValues: {
       answerType: "static",
     },
-  })
+  });
 
-  const answerType = watch("answerType")
+  const answerType = watch("answerType");
 
   const onSubmit = async (data: QuestionFormData) => {
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 500))
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-      onAddQuestion(data)
+      onAddQuestion(data);
 
       toast.success("Question added successfully", {
         description: "Your riddle question has been added to the project.",
-      })
+      });
 
       // Reset form and close dialog
-      reset()
-      onOpenChange(false)
+      reset();
+      onOpenChange(false);
     } catch (error) {
       toast.error("Error adding question", {
         description: "Something went wrong. Please try again.",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -85,7 +89,9 @@ export function AddQuestionDialog({ open, onOpenChange, onAddQuestion }: AddQues
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader>
             <DialogTitle>Add New Question</DialogTitle>
-            <DialogDescription>Create a new riddle question for your campaign.</DialogDescription>
+            <DialogDescription>
+              Create a new riddle question for your campaign.
+            </DialogDescription>
           </DialogHeader>
           <div className="grid gap-6 py-4">
             <div className="space-y-2">
@@ -93,17 +99,25 @@ export function AddQuestionDialog({ open, onOpenChange, onAddQuestion }: AddQues
               <Textarea
                 id="question"
                 placeholder="Enter your riddle question..."
-                className={`min-h-[100px] ${errors.question ? "border-destructive" : ""}`}
+                className={`min-h-[100px] ${
+                  errors.question ? "border-destructive" : ""
+                }`}
                 {...register("question")}
               />
-              {errors.question && <p className="text-sm text-destructive">{errors.question.message}</p>}
+              {errors.question && (
+                <p className="text-sm text-destructive">
+                  {errors.question.message}
+                </p>
+              )}
             </div>
 
             <div className="space-y-3">
               <Label>Answer Type</Label>
               <RadioGroup
                 value={answerType}
-                onValueChange={(value: "static" | "ai-validated") => setValue("answerType", value)}
+                onValueChange={(value: "static" | "ai-validated") =>
+                  setValue("answerType", value)
+                }
               >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="static" id="static" />
@@ -114,11 +128,19 @@ export function AddQuestionDialog({ open, onOpenChange, onAddQuestion }: AddQues
                   <Label htmlFor="ai-validated">AI Validated</Label>
                 </div>
               </RadioGroup>
-              {errors.answerType && <p className="text-sm text-destructive">{errors.answerType.message}</p>}
+              {errors.answerType && (
+                <p className="text-sm text-destructive">
+                  {errors.answerType.message}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="answer">{answerType === "static" ? "Answer" : "Answer Context/Description"}</Label>
+              <Label htmlFor="answer">
+                {answerType === "static"
+                  ? "Answer"
+                  : "Answer Context/Description"}
+              </Label>
               {answerType === "static" ? (
                 <Input
                   id="answer"
@@ -130,11 +152,17 @@ export function AddQuestionDialog({ open, onOpenChange, onAddQuestion }: AddQues
                 <Textarea
                   id="answer"
                   placeholder="Describe the answer context for AI validation..."
-                  className={`min-h-[80px] ${errors.answer ? "border-destructive" : ""}`}
+                  className={`min-h-[80px] ${
+                    errors.answer ? "border-destructive" : ""
+                  }`}
                   {...register("answer")}
                 />
               )}
-              {errors.answer && <p className="text-sm text-destructive">{errors.answer.message}</p>}
+              {errors.answer && (
+                <p className="text-sm text-destructive">
+                  {errors.answer.message}
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -153,7 +181,11 @@ export function AddQuestionDialog({ open, onOpenChange, onAddQuestion }: AddQues
                     />
                   )}
                 />
-                {errors.startTime && <p className="text-sm text-destructive">{errors.startTime.message}</p>}
+                {errors.startTime && (
+                  <p className="text-sm text-destructive">
+                    {errors.startTime.message}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="endTime">End Time</Label>
@@ -170,18 +202,26 @@ export function AddQuestionDialog({ open, onOpenChange, onAddQuestion }: AddQues
                     />
                   )}
                 />
-                {errors.endTime && <p className="text-sm text-destructive">{errors.endTime.message}</p>}
+                {errors.endTime && (
+                  <p className="text-sm text-destructive">
+                    {errors.endTime.message}
+                  </p>
+                )}
               </div>
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={isLoading}
-              className="bg-binance-yellow text-black hover:bg-binance-yellow/90"
+              className="bg-primary text-black hover:bg-primary/90"
             >
               {isLoading ? "Adding..." : "Add Question"}
             </Button>
@@ -189,5 +229,5 @@ export function AddQuestionDialog({ open, onOpenChange, onAddQuestion }: AddQues
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

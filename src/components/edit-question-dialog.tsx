@@ -235,7 +235,7 @@ export function EditQuestionDialog({
             <Button
               type="submit"
               disabled={isLoading}
-              className="bg-binance-yellow text-black hover:bg-binance-yellow/90"
+              className="bg-primary text-black hover:bg-primary/90"
             >
               {isLoading ? "Updating..." : "Update Question"}
             </Button>

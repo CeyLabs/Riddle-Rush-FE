@@ -1,33 +1,59 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Button } from "@/components/ui/button"
-import { Plus, Search, Calendar, Clock, FileText, Trophy, Bitcoin, Grid3X3, List } from "lucide-react"
-import { CreateCampaignDialog } from "@/components/create-campaign-dialog"
-import { useAppStore } from "@/lib/store"
-import { formatDate, getStatusColor, getStatusTextColor } from "@/lib/utils"
-import Link from "next/link"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import {
+  Plus,
+  Search,
+  Calendar,
+  Clock,
+  FileText,
+  Trophy,
+  Bitcoin,
+  Grid3X3,
+  List,
+} from "lucide-react";
+import { CreateCampaignDialog } from "@/components/create-campaign-dialog";
+import { useAppStore } from "@/lib/store";
+import { formatDate, getStatusColor, getStatusTextColor } from "@/lib/utils";
+import Link from "next/link";
 
 export function CampaignGrid() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const campaigns = useAppStore((state) => state.campaigns)
-  const viewMode = useAppStore((state) => state.viewMode)
-  const setViewMode = useAppStore((state) => state.setViewMode)
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const campaigns = useAppStore((state) => state.campaigns);
+  const viewMode = useAppStore((state) => state.viewMode);
+  const setViewMode = useAppStore((state) => state.setViewMode);
 
   const filteredCampaigns = campaigns.filter((campaign) =>
     campaign.name.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+  );
 
   const isBlockchainProject = (name: string) => {
-    const blockchainKeywords = ["blockchain", "crypto", "bitcoin", "ethereum", "defi", "nft", "web3"]
-    return blockchainKeywords.some((keyword) => name.toLowerCase().includes(keyword))
-  }
+    const blockchainKeywords = [
+      "blockchain",
+      "crypto",
+      "bitcoin",
+      "ethereum",
+      "defi",
+      "nft",
+      "web3",
+    ];
+    return blockchainKeywords.some((keyword) =>
+      name.toLowerCase().includes(keyword),
+    );
+  };
 
   const CampaignSkeleton = () => (
     <Card className="h-48">
@@ -45,7 +71,7 @@ export function CampaignGrid() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 
   const CampaignListSkeleton = () => (
     <Card className="p-4">
@@ -60,7 +86,7 @@ export function CampaignGrid() {
         </div>
       </div>
     </Card>
-  )
+  );
 
   if (isLoading) {
     return (
@@ -68,20 +94,24 @@ export function CampaignGrid() {
         <div className="flex items-center space-x-4">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input placeholder="Search campaigns..." className="pl-10" disabled />
+            <Input
+              placeholder="Search campaigns..."
+              className="pl-10"
+              disabled
+            />
           </div>
           <div className="flex items-center">
             <Button
               variant="outline"
               size="sm"
-              className="bg-binance-yellow hover:bg-binance-yellow/90 text-black rounded-r-none border-r-0"
+              className="bg-primary hover:bg-primary/90 text-black rounded-r-none border-r-0"
             >
               <Grid3X3 className="w-4 h-4" />
             </Button>
             <Button
               variant="outline"
               size="sm"
-              className="bg-binance-yellow hover:bg-binance-yellow/90 text-black rounded-l-none"
+              className="bg-primary hover:bg-primary/90 text-black rounded-l-none"
             >
               <List className="w-4 h-4" />
             </Button>
@@ -101,7 +131,7 @@ export function CampaignGrid() {
           </div>
         )}
       </div>
-    )
+    );
   }
 
   return (
@@ -114,7 +144,7 @@ export function CampaignGrid() {
             placeholder="Search campaigns..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-binance-yellow/20"
+            className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
           />
         </div>
         <div className="flex items-center">
@@ -122,7 +152,11 @@ export function CampaignGrid() {
             variant={viewMode === "grid" ? "default" : "outline"}
             size="sm"
             onClick={() => setViewMode("grid")}
-            className={`rounded-r-none border-r-0 ${viewMode === "grid" ? "bg-binance-yellow hover:bg-binance-yellow/90 text-black" : ""}`}
+            className={`rounded-r-none border-r-0 ${
+              viewMode === "grid"
+                ? "bg-primary hover:bg-primary/90 text-black"
+                : ""
+            }`}
           >
             <Grid3X3 className="w-4 h-4" />
           </Button>
@@ -130,7 +164,11 @@ export function CampaignGrid() {
             variant={viewMode === "list" ? "default" : "outline"}
             size="sm"
             onClick={() => setViewMode("list")}
-            className={`rounded-l-none ${viewMode === "list" ? "bg-binance-yellow hover:bg-binance-yellow/90 text-black" : ""}`}
+            className={`rounded-l-none ${
+              viewMode === "list"
+                ? "bg-primary hover:bg-primary/90 text-black"
+                : ""
+            }`}
           >
             <List className="w-4 h-4" />
           </Button>
@@ -141,12 +179,12 @@ export function CampaignGrid() {
       {viewMode === "grid" ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           <Card
-            className="border-dashed border-2 border-binance-yellow hover:bg-binance-yellow/10 cursor-pointer transition-all duration-200 hover:scale-105 h-48 group"
+            className="border-dashed border-2 border-primary cursor-pointer transition-all duration-200 hover:scale-105 h-48 group"
             onClick={() => setIsCreateDialogOpen(true)}
           >
             <CardContent className="flex flex-col items-center justify-center h-full space-y-4">
-              <div className="w-16 h-16 rounded-full bg-binance-yellow/10 flex items-center justify-center transition-colors duration-200 group-hover:bg-binance-yellow/20">
-                <Plus className="w-8 h-8 text-binance-yellow" />
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center transition-colors duration-200 group-hover:bg-primary/20">
+                <Plus className="w-8 h-8 text-primary" />
               </div>
               <div className="text-center">
                 <h3 className="font-semibold text-foreground group-hover:text-gray-900 dark:group-hover:text-gray-100 transition-colors duration-200">
@@ -165,14 +203,20 @@ export function CampaignGrid() {
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <CardTitle className="text-lg group-hover:text-binance-yellow transition-colors duration-200 line-clamp-2">
+                      <CardTitle className="text-lg group-hover:text-primary transition-colors duration-200 line-clamp-2">
                         {campaign.name}
                       </CardTitle>
-                      {isBlockchainProject(campaign.name) && <Bitcoin className="w-4 h-4 text-binance-yellow" />}
+                      {isBlockchainProject(campaign.name) && (
+                        <Bitcoin className="w-4 h-4 text-primary" />
+                      )}
                     </div>
                     <Badge
                       variant="secondary"
-                      className={`${getStatusColor(campaign.status)} ${getStatusTextColor(campaign.status)} transition-colors duration-200`}
+                      className={`${getStatusColor(
+                        campaign.status,
+                      )} ${getStatusTextColor(
+                        campaign.status,
+                      )} transition-colors duration-200`}
                     >
                       {campaign.status}
                     </Badge>
@@ -190,7 +234,7 @@ export function CampaignGrid() {
                       <FileText className="w-4 h-4" />
                       <span>{campaign.questionCount} questions</span>
                     </span>
-                    <Clock className="w-4 h-4 text-muted-foreground group-hover:text-binance-yellow transition-colors duration-200" />
+                    <Clock className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors duration-200" />
                   </div>
                 </CardContent>
               </Card>
@@ -200,12 +244,12 @@ export function CampaignGrid() {
       ) : (
         <div className="space-y-4">
           <Card
-            className="border-dashed border-2 border-binance-yellow hover:bg-binance-yellow/10 cursor-pointer transition-all duration-200 p-4 group"
+            className="border-dashed border-2 border-primary hover:bg-primary/10 cursor-pointer transition-all duration-200 p-4 group"
             onClick={() => setIsCreateDialogOpen(true)}
           >
             <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-full bg-binance-yellow/10 flex items-center justify-center">
-                <Plus className="w-6 h-6 text-binance-yellow" />
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <Plus className="w-6 h-6 text-primary" />
               </div>
               <div>
                 <h3 className="font-semibold text-foreground group-hover:text-gray-900 dark:group-hover:text-gray-100 transition-colors duration-200">
@@ -224,14 +268,20 @@ export function CampaignGrid() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-2">
-                      <h3 className="text-lg font-semibold group-hover:text-binance-yellow transition-colors duration-200">
+                      <h3 className="text-lg font-semibold group-hover:text-primary transition-colors duration-200">
                         {campaign.name}
                       </h3>
-                      {isBlockchainProject(campaign.name) && <Bitcoin className="w-4 h-4 text-binance-yellow" />}
+                      {isBlockchainProject(campaign.name) && (
+                        <Bitcoin className="w-4 h-4 text-primary" />
+                      )}
                     </div>
                     <Badge
                       variant="secondary"
-                      className={`${getStatusColor(campaign.status)} ${getStatusTextColor(campaign.status)} transition-colors duration-200`}
+                      className={`${getStatusColor(
+                        campaign.status,
+                      )} ${getStatusTextColor(
+                        campaign.status,
+                      )} transition-colors duration-200`}
                     >
                       {campaign.status}
                     </Badge>
@@ -245,7 +295,7 @@ export function CampaignGrid() {
                       <FileText className="w-4 h-4" />
                       <span>{campaign.questionCount} questions</span>
                     </span>
-                    <Trophy className="w-4 h-4 group-hover:text-binance-yellow transition-colors duration-200" />
+                    <Trophy className="w-4 h-4 group-hover:text-primary transition-colors duration-200" />
                   </div>
                 </div>
               </Card>
@@ -259,12 +309,19 @@ export function CampaignGrid() {
           <div className="w-16 h-16 rounded-full bg-muted mx-auto mb-4 flex items-center justify-center">
             <Search className="w-8 h-8 text-muted-foreground" />
           </div>
-          <h3 className="text-lg font-semibold text-foreground mb-2">No campaigns found</h3>
-          <p className="text-muted-foreground">Try adjusting your search terms or create a new campaign.</p>
+          <h3 className="text-lg font-semibold text-foreground mb-2">
+            No campaigns found
+          </h3>
+          <p className="text-muted-foreground">
+            Try adjusting your search terms or create a new campaign.
+          </p>
         </div>
       )}
 
-      <CreateCampaignDialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen} />
+      <CreateCampaignDialog
+        open={isCreateDialogOpen}
+        onOpenChange={setIsCreateDialogOpen}
+      />
     </div>
-  )
+  );
 }

@@ -1,25 +1,33 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Trophy, Clock, Calendar } from "lucide-react"
-import { useAppStore } from "@/lib/store"
-import { formatDate, formatTime } from "@/lib/utils"
-import { getRankIcon, getScoreColor } from "@/lib/utils" // Added imports for getRankIcon and getScoreColor
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Trophy, Clock, Calendar } from "lucide-react";
+import { useAppStore } from "@/lib/store";
+import { formatDate, formatTime } from "@/lib/utils";
+import { getRankIcon, getScoreColor } from "@/lib/utils"; // Added imports for getRankIcon and getScoreColor
 
 interface CampaignLeaderboardProps {
-  campaignId: string
+  campaignId: string;
 }
 
 export function CampaignLeaderboard({ campaignId }: CampaignLeaderboardProps) {
-  const getCampaignLeaderboard = useAppStore((state) => state.getCampaignLeaderboard)
-  const leaderboard = getCampaignLeaderboard(campaignId)
+  const getCampaignLeaderboard = useAppStore(
+    (state) => state.getCampaignLeaderboard,
+  );
+  const leaderboard = getCampaignLeaderboard(campaignId);
 
   if (leaderboard.length === 0) {
     return (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <Trophy className="w-5 h-5 text-binance-yellow" />
+            <Trophy className="w-5 h-5 text-primary" />
             <span>Leaderboard</span>
           </CardTitle>
           <CardDescription>Top performers for this campaign</CardDescription>
@@ -28,18 +36,20 @@ export function CampaignLeaderboard({ campaignId }: CampaignLeaderboardProps) {
           <div className="text-center py-8">
             <Trophy className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <p className="text-muted-foreground">No participants yet</p>
-            <p className="text-sm text-muted-foreground mt-1">Be the first to complete this challenge!</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Be the first to complete this challenge!
+            </p>
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
-          <Trophy className="w-5 h-5 text-binance-yellow" />
+          <Trophy className="w-5 h-5 text-primary" />
           <span>Leaderboard</span>
         </CardTitle>
         <CardDescription>Top performers for this campaign</CardDescription>
@@ -50,7 +60,9 @@ export function CampaignLeaderboard({ campaignId }: CampaignLeaderboardProps) {
             <div
               key={entry.id}
               className={`flex items-center justify-between p-3 rounded-lg border transition-colors duration-200 ${
-                index === 0 ? "bg-binance-yellow/5 border-binance-yellow/20" : "hover:bg-muted/50"
+                index === 0
+                  ? "bg-primary/5 border-primary/20"
+                  : "hover:bg-muted/50"
               }`}
             >
               <div className="flex items-center space-x-4">
@@ -72,7 +84,11 @@ export function CampaignLeaderboard({ campaignId }: CampaignLeaderboardProps) {
                 </div>
               </div>
               <div className="text-right">
-                <div className={`text-2xl font-bold ${getScoreColor(entry.score)}`}>{entry.score}</div>
+                <div
+                  className={`text-2xl font-bold ${getScoreColor(entry.score)}`}
+                >
+                  {entry.score}
+                </div>
                 <div className="text-xs text-muted-foreground">points</div>
               </div>
             </div>
@@ -80,5 +96,5 @@ export function CampaignLeaderboard({ campaignId }: CampaignLeaderboardProps) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

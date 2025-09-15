@@ -12,10 +12,10 @@ const getCampaign = (id: string) => ({
     id === "1"
       ? "Math Riddles Challenge"
       : id === "2"
-      ? "Logic Puzzles"
-      : id === "4"
-      ? "Blockchain & Crypto Quiz"
-      : "New Campaign",
+        ? "Logic Puzzles"
+        : id === "4"
+          ? "Blockchain & Crypto Quiz"
+          : "New Campaign",
   createdAt: "2024-01-15",
   status: "active" as const,
   description:
@@ -41,13 +41,13 @@ export default async function CampaignPage({
           <TabsList className="grid w-full grid-cols-2 mb-8">
             <TabsTrigger
               value="questions"
-              className="data-[state=active]:bg-binance-yellow data-[state=active]:text-black"
+              className="data-[state=active]:bg-primary data-[state=active]:text-black"
             >
               Questions
             </TabsTrigger>
             <TabsTrigger
               value="leaderboard"
-              className="data-[state=active]:bg-binance-yellow data-[state=active]:text-black"
+              className="data-[state=active]:bg-primary data-[state=active]:text-black"
             >
               Leaderboard
             </TabsTrigger>

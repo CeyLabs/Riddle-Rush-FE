@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,51 +9,56 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { AlertTriangle } from "lucide-react"
-import { toast } from "sonner"
+} from "@/components/ui/dialog";
+import { AlertTriangle } from "lucide-react";
+import { toast } from "sonner";
 
 interface Question {
-  id: string
-  question: string
-  answerType: "static" | "ai-validated"
-  answer: string
-  startTime: string
-  endTime: string
-  status: "upcoming" | "active" | "ended"
+  id: string;
+  question: string;
+  answerType: "static" | "ai-validated";
+  answer: string;
+  startTime: string;
+  endTime: string;
+  status: "upcoming" | "active" | "ended";
 }
 
 interface DeleteQuestionDialogProps {
-  question: Question
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onDeleteQuestion: (questionId: string) => void
+  question: Question;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onDeleteQuestion: (questionId: string) => void;
 }
 
-export function DeleteQuestionDialog({ question, open, onOpenChange, onDeleteQuestion }: DeleteQuestionDialogProps) {
-  const [isLoading, setIsLoading] = useState(false)
+export function DeleteQuestionDialog({
+  question,
+  open,
+  onOpenChange,
+  onDeleteQuestion,
+}: DeleteQuestionDialogProps) {
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleDelete = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 500))
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-      onDeleteQuestion(question.id)
+      onDeleteQuestion(question.id);
 
       toast.success("Question deleted successfully", {
         description: "The riddle question has been removed from your project.",
-      })
+      });
 
-      setIsLoading(false)
+      setIsLoading(false);
     } catch (error) {
       toast.error("Error deleting question", {
         description: "Something went wrong. Please try again.",
-      })
-      setIsLoading(false)
+      });
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -64,24 +69,37 @@ export function DeleteQuestionDialog({ question, open, onOpenChange, onDeleteQue
             <DialogTitle>Delete Question</DialogTitle>
           </div>
           <DialogDescription>
-            Are you sure you want to delete this question? This action cannot be undone.
+            Are you sure you want to delete this question? This action cannot be
+            undone.
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">
           <div className="bg-muted p-3 rounded-lg">
-            <p className="text-sm font-medium text-foreground mb-1">Question:</p>
-            <p className="text-sm text-muted-foreground line-clamp-3">{question.question}</p>
+            <p className="text-sm font-medium text-foreground mb-1">
+              Question:
+            </p>
+            <p className="text-sm text-muted-foreground line-clamp-3">
+              {question.question}
+            </p>
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isLoading}
+          >
             Cancel
           </Button>
-          <Button variant="destructive" onClick={handleDelete} disabled={isLoading}>
+          <Button
+            variant="destructive"
+            onClick={handleDelete}
+            disabled={isLoading}
+          >
             {isLoading ? "Deleting..." : "Delete Question"}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
