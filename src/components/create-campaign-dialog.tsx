@@ -18,7 +18,7 @@ import { Select } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/lib/store";
 import { campaignSchema, type CampaignFormData } from "@/lib/validations";
-import { useCreateCampaign } from "@/hooks/use-campaigns";
+import { useCreateCampaign } from "@/hooks/query-hooks";
 
 interface CreateCampaignDialogProps {
   open: boolean;
@@ -48,25 +48,17 @@ export function CreateCampaignDialog({
         name: data.name,
         description: data.description,
         language: data.language,
-        is_active: "true",
+        is_active: true,
       };
 
       const result = await createCampaignMutation.mutateAsync(payload);
-
-      // Also update local store for immediate UI feedback
-      const campaignId = addCampaign({
-        name: data.name,
-        status: "draft",
-        description:
-          data.description || "A new riddle campaign ready for questions",
-      });
 
       // Reset form and close dialog
       reset();
       onOpenChange(false);
 
-      // Navigate to the campaign (use API result ID if available, otherwise local store ID)
-      router.push(`/campaign/${result.id || campaignId}`);
+      // Navigate to the campaign
+      router.push(`/campaign/${result.id}`);
     } catch (error) {
       // Error handling is done in the hook
       console.error("Campaign creation failed:", error);
