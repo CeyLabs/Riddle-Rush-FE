@@ -26,19 +26,22 @@ import {
 import { CreateCampaignDialog } from "@/components/create-campaign-dialog";
 import { useAppStore } from "@/lib/store";
 import { formatDate, getStatusColor, getStatusTextColor } from "@/lib/utils";
+import { useAllCampaigns } from "@/hooks/query-hooks";
 import Link from "next/link";
 
 export function CampaignGrid() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const campaigns = useAppStore((state) => state.campaigns);
+  const { data: campaigns = [], isLoading, error } = useAllCampaigns();
   const viewMode = useAppStore((state) => state.viewMode);
   const setViewMode = useAppStore((state) => state.setViewMode);
 
   const filteredCampaigns = campaigns.filter((campaign) =>
     campaign.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const getDisplayStatus = (isActive: boolean) =>
+    isActive ? "active" : "draft";
 
   const isBlockchainProject = (name: string) => {
     const blockchainKeywords = [
@@ -134,6 +137,21 @@ export function CampaignGrid() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <div className="w-16 h-16 rounded-full bg-destructive/10 mx-auto mb-4 flex items-center justify-center">
+          <FileText className="w-8 h-8 text-destructive" />
+        </div>
+        <h3 className="text-xl font-semibold mb-2">Failed to load campaigns</h3>
+        <p className="text-muted-foreground mb-4">
+          {error.message || "Something went wrong while fetching campaigns."}
+        </p>
+        <Button onClick={() => window.location.reload()}>Try Again</Button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Search and View Toggle */}
@@ -210,26 +228,32 @@ export function CampaignGrid() {
                     <Badge
                       variant="secondary"
                       className={`${getStatusColor(
-                        campaign.status
+                        getDisplayStatus(campaign.is_active)
                       )} ${getStatusTextColor(
-                        campaign.status
+                        getDisplayStatus(campaign.is_active)
                       )} transition-colors duration-200`}
                     >
-                      {campaign.status}
+                      {getDisplayStatus(campaign.is_active)}
                     </Badge>
                   </div>
                   <CardDescription className="flex items-center space-x-4 text-sm">
                     <span className="flex items-center space-x-1">
-                      <Calendar className="size-4" />
-                      <span>{formatDate(campaign.createdAt)}</span>
+                      <span className="text-muted-foreground">
+                        Language: {campaign.language.toUpperCase()}
+                      </span>
                     </span>
+                    {campaign.description && (
+                      <span className="text-xs text-muted-foreground line-clamp-2">
+                        {campaign.description}
+                      </span>
+                    )}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground flex items-center space-x-1">
                       <FileText className="size-4" />
-                      <span>{campaign.questionCount} questions</span>
+                      <span>0 questions</span>
                     </span>
                     <Clock className="size-4 text-muted-foreground group-hover:text-primary transition-colors duration-200" />
                   </div>
@@ -272,22 +296,21 @@ export function CampaignGrid() {
                     <Badge
                       variant="secondary"
                       className={`${getStatusColor(
-                        campaign.status
+                        getDisplayStatus(campaign.is_active)
                       )} ${getStatusTextColor(
-                        campaign.status
+                        getDisplayStatus(campaign.is_active)
                       )} transition-colors duration-200`}
                     >
-                      {campaign.status}
+                      {getDisplayStatus(campaign.is_active)}
                     </Badge>
                   </div>
                   <div className="flex items-center space-x-6 text-sm text-muted-foreground">
                     <span className="flex items-center space-x-1">
-                      <Calendar className="size-4" />
-                      <span>{formatDate(campaign.createdAt)}</span>
+                      <span>Language: {campaign.language.toUpperCase()}</span>
                     </span>
                     <span className="flex items-center space-x-1">
                       <FileText className="size-4" />
-                      <span>{campaign.questionCount} questions</span>
+                      <span>0 questions</span>
                     </span>
                     <Trophy className="size-4 group-hover:text-primary transition-colors duration-200" />
                   </div>

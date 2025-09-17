@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 const API_BASE_URL = "http://localhost:3000/api";
@@ -11,6 +11,19 @@ interface Campaign {
   description?: string;
   language: SupportedLanguages;
   is_active: boolean;
+}
+
+export function useAllCampaigns() {
+  return useQuery({
+    queryKey: ["campaigns"],
+    queryFn: async (): Promise<Campaign[]> => {
+      const response = await fetch(`${API_BASE_URL}/campaigns`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch campaigns");
+      }
+      return response.json();
+    },
+  });
 }
 
 export function useCreateCampaign() {
