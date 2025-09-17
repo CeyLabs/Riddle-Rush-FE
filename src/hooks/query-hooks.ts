@@ -36,6 +36,22 @@ export function useAllCampaigns() {
   });
 }
 
+export function useCampaignRiddles(campaignId: string) {
+  return useQuery({
+    queryKey: ["riddles", campaignId],
+    queryFn: async (): Promise<Riddle[]> => {
+      const response = await fetch(
+        `${API_BASE_URL}/campaigns/${campaignId}/riddles`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch riddles");
+      }
+      return response.json();
+    },
+    enabled: !!campaignId, // Only fetch if campaignId is provided
+  });
+}
+
 export function useCreateCampaign() {
   const queryClient = useQueryClient();
 
@@ -111,6 +127,45 @@ export function useCreateRiddle() {
     },
     onError: (error) => {
       toast.error("Error creating riddle", {
+        description: error.message || "Something went wrong. Please try again.",
+      });
+    },
+  });
+}
+
+export function useDeleteRiddle() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      riddleId,
+      campaignId,
+    }: {
+      riddleId: string;
+      campaignId: string;
+    }) => {
+      const response = await fetch(`${API_BASE_URL}/riddles/${riddleId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to delete riddle");
+      }
+
+      return { riddleId, campaignId };
+    },
+    onSuccess: (data) => {
+      // Invalidate and refetch riddles list for this campaign
+      queryClient.invalidateQueries({
+        queryKey: ["riddles", data.campaignId],
+      });
+      toast.success("Riddle deleted successfully", {
+        description: "The riddle has been removed from the campaign.",
+      });
+    },
+    onError: (error) => {
+      toast.error("Error deleting riddle", {
         description: error.message || "Something went wrong. Please try again.",
       });
     },

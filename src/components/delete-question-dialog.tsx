@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,23 +10,23 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { AlertTriangle } from "lucide-react";
-import { toast } from "sonner";
 
 interface Question {
   id: string;
+  campaign_id: string;
   question: string;
-  answerType: "static" | "ai-validated";
   answer: string;
-  startTime: string;
-  endTime: string;
-  status: "upcoming" | "active" | "ended";
+  is_answer_static: boolean;
+  start_date: string;
+  end_date: string;
 }
 
 interface DeleteQuestionDialogProps {
   question: Question;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onDeleteQuestion: (questionId: string) => void;
+  onDeleteQuestion: (question: Question) => void;
+  isLoading?: boolean;
 }
 
 export function DeleteQuestionDialog({
@@ -35,29 +34,11 @@ export function DeleteQuestionDialog({
   open,
   onOpenChange,
   onDeleteQuestion,
+  isLoading = false,
 }: DeleteQuestionDialogProps) {
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleDelete = async () => {
-    setIsLoading(true);
-
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      onDeleteQuestion(question.id);
-
-      toast.success("Question deleted successfully", {
-        description: "The riddle question has been removed from your project.",
-      });
-
-      setIsLoading(false);
-    } catch (error) {
-      toast.error("Error deleting question", {
-        description: "Something went wrong. Please try again.",
-      });
-      setIsLoading(false);
-    }
+  const handleDelete = () => {
+    onDeleteQuestion(question);
+    onOpenChange(false);
   };
 
   return (
