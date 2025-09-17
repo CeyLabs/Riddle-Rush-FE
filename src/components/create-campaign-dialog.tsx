@@ -14,9 +14,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useRouter } from "next/navigation";
-import { useAppStore } from "@/lib/store";
 import { campaignSchema, type CampaignFormData } from "@/lib/validations";
 import { useCreateCampaign } from "@/hooks/query-hooks";
 
@@ -30,7 +35,6 @@ export function CreateCampaignDialog({
   onOpenChange,
 }: CreateCampaignDialogProps) {
   const router = useRouter();
-  const addCampaign = useAppStore((state) => state.addCampaign);
   const createCampaignMutation = useCreateCampaign();
 
   const {
@@ -38,31 +42,32 @@ export function CreateCampaignDialog({
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
+    watch,
   } = useForm<CampaignFormData>({
     resolver: zodResolver(campaignSchema),
+    defaultValues: {
+      language: "en",
+    },
   });
 
   const onSubmit = async (data: CampaignFormData) => {
-    try {
-      const payload = {
-        name: data.name,
-        description: data.description,
-        language: data.language,
-        is_active: true,
-      };
+    const payload = {
+      name: data.name,
+      description: data.description,
+      language: data.language,
+      is_active: true,
+    };
 
-      const result = await createCampaignMutation.mutateAsync(payload);
-
-      // Reset form and close dialog
-      reset();
-      onOpenChange(false);
-
-      // Navigate to the campaign
-      router.push(`/campaign/${result.id}`);
-    } catch (error) {
-      // Error handling is done in the hook
-      console.error("Campaign creation failed:", error);
-    }
+    createCampaignMutation.mutate(payload, {
+      onSuccess: (result) => {
+        // Reset form and close dialog
+        reset();
+        onOpenChange(false);
+        // Navigate to the campaign
+        router.push(`/campaign/${result.id}`);
+      },
+    });
   };
 
   return (
@@ -121,12 +126,19 @@ export function CreateCampaignDialog({
               <Label htmlFor="language" className="text-sm font-medium">
                 Language
               </Label>
-              <Select {...register("language")}>
-                <option value="" disabled>
-                  Select a language
-                </option>
-                <option value="en">English</option>
-                <option value="ar">Arabic</option>
+              <Select
+                value={watch("language")}
+                onValueChange={(value) =>
+                  setValue("language", value as "en" | "ar")
+                }
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Language" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="en">English</SelectItem>
+                  <SelectItem value="ar">Arabic</SelectItem>
+                </SelectContent>
               </Select>
               {errors.language && (
                 <p className="text-sm text-destructive animate-in slide-in-from-top-1">
