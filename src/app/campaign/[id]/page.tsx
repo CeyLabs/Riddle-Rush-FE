@@ -1,4 +1,5 @@
 "use client";
+
 import { Navbar } from "@/components/layout/navbar";
 import { CampaignHeader } from "@/components/campaign-header";
 import { QuestionList } from "@/components/question-list";
@@ -12,10 +13,10 @@ const getCampaign = (id: string) => ({
     id === "1"
       ? "Math Riddles Challenge"
       : id === "2"
-        ? "Logic Puzzles"
-        : id === "4"
-          ? "Blockchain & Crypto Quiz"
-          : "New Campaign",
+      ? "Logic Puzzles"
+      : id === "4"
+      ? "Blockchain & Crypto Quiz"
+      : "New Campaign",
   createdAt: "2024-01-15",
   status: "active" as const,
   description:
@@ -39,18 +40,8 @@ export default async function CampaignPage({
 
         <Tabs defaultValue="questions" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-8">
-            <TabsTrigger
-              value="questions"
-              className="data-[state=active]:bg-primary data-[state=active]:text-black"
-            >
-              Questions
-            </TabsTrigger>
-            <TabsTrigger
-              value="leaderboard"
-              className="data-[state=active]:bg-primary data-[state=active]:text-black"
-            >
-              Leaderboard
-            </TabsTrigger>
+            <TabsTrigger value="questions">Questions</TabsTrigger>
+            <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
           </TabsList>
 
           <TabsContent value="questions" className="space-y-6">

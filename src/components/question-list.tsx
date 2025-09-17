@@ -160,7 +160,7 @@ export function QuestionList({ campaignId }: QuestionListProps) {
         </div>
         <Button
           onClick={() => setIsAddDialogOpen(true)}
-          className="bg-primary text-black hover:bg-primary/90 transition-all duration-200 hover:scale-105"
+          className="bg-primary text-black hover:bg-primary/90 transition-all duration-200 hover:scale-101"
         >
           <Plus className="size-4 mr-2" />
           Add Question
@@ -194,9 +194,9 @@ export function QuestionList({ campaignId }: QuestionListProps) {
           {campaignQuestions.map((question, index) => (
             <Card
               key={question.id}
-              className="hover:shadow-lg transition-all duration-200 hover:scale-[1.02] group"
+              className="hover:shadow-lg transition-all duration-200 hover:scale-[1.01] group gap-3"
             >
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-0">
                 <div className="flex items-start justify-between">
                   <div className="space-y-2 flex-1">
                     <div className="flex items-start space-x-3">
@@ -251,7 +251,7 @@ export function QuestionList({ campaignId }: QuestionListProps) {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="pt-0">
+              <CardContent>
                 <div className="space-y-3">
                   <div className="ml-12">
                     <p className="text-sm font-medium text-foreground mb-1">
