@@ -17,7 +17,11 @@ import { AddQuestionDialog } from "@/components/add-question-dialog";
 import { EditQuestionDialog } from "@/components/edit-question-dialog";
 import { DeleteQuestionDialog } from "@/components/delete-question-dialog";
 import { formatDate, getStatusColor, getStatusTextColor } from "@/lib/utils";
-import { useCampaignRiddles, useDeleteRiddle } from "@/hooks/query-hooks";
+import {
+  useCampaignRiddles,
+  useDeleteRiddle,
+  useUpdateRiddle,
+} from "@/hooks/query-hooks";
 
 interface Question {
   id: string;
@@ -46,7 +50,7 @@ export function QuestionList({ campaignId }: QuestionListProps) {
     error,
   } = useCampaignRiddles(campaignId);
 
-  const deleteRiddleMutation = useDeleteRiddle();
+
 
   const getStatusIcon = (
     isActive: boolean,
@@ -80,25 +84,7 @@ export function QuestionList({ campaignId }: QuestionListProps) {
     }
   };
 
-  const handleAddQuestion = (
-    newQuestion: Omit<Question, "id" | "campaign_id">
-  ) => {
-    // This is now handled by the mutation in add-question-dialog
-    console.log("Question added:", newQuestion);
-  };
 
-  const handleEditQuestion = (updatedQuestion: Question) => {
-    // TODO: Implement edit question API call
-    console.log("Question updated:", updatedQuestion);
-    setEditingQuestion(null);
-  };
-
-  const handleDeleteQuestion = (question: Question) => {
-    deleteRiddleMutation.mutate({
-      riddleId: question.id,
-      campaignId,
-    });
-  };
 
   if (error) {
     return (
@@ -286,7 +272,6 @@ export function QuestionList({ campaignId }: QuestionListProps) {
                       variant="ghost"
                       size="sm"
                       onClick={() => setDeletingQuestion(question)}
-                      disabled={deleteRiddleMutation.isPending}
                       className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10 transition-all duration-200"
                     >
                       <Trash2 className="size-4" />
@@ -332,20 +317,16 @@ export function QuestionList({ campaignId }: QuestionListProps) {
           question={deletingQuestion}
           open={!!deletingQuestion}
           onOpenChange={(open) => !open && setDeletingQuestion(null)}
-          onDeleteQuestion={handleDeleteQuestion}
-          isLoading={deleteRiddleMutation.isPending}
         />
       )}
 
-      {/* TODO: Update EditQuestionDialog to work with new API interface */}
-      {/* {editingQuestion && (
+      {editingQuestion && (
         <EditQuestionDialog
           question={editingQuestion}
           open={!!editingQuestion}
           onOpenChange={(open) => !open && setEditingQuestion(null)}
-          onEditQuestion={handleEditQuestion}
         />
-      )} */}
+      )}
     </div>
   );
 }

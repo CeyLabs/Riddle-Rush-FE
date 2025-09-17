@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useDeleteRiddle } from "@/hooks/query-hooks";
 import { AlertTriangle } from "lucide-react";
 
 interface Question {
@@ -25,20 +26,19 @@ interface DeleteQuestionDialogProps {
   question: Question;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onDeleteQuestion: (question: Question) => void;
-  isLoading?: boolean;
 }
 
 export function DeleteQuestionDialog({
   question,
   open,
   onOpenChange,
-  onDeleteQuestion,
-  isLoading = false,
 }: DeleteQuestionDialogProps) {
-  const handleDelete = () => {
-    onDeleteQuestion(question);
-    onOpenChange(false);
+  const deleteRiddleMutation = useDeleteRiddle();
+
+  const handleDeleteQuestion = (question: Question) => {
+    deleteRiddleMutation.mutate({
+      riddleId: question.id,
+    });
   };
 
   return (
@@ -68,16 +68,16 @@ export function DeleteQuestionDialog({
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
-            disabled={isLoading}
+            disabled={deleteRiddleMutation.isPending}
           >
             Cancel
           </Button>
           <Button
             variant="destructive"
-            onClick={handleDelete}
-            disabled={isLoading}
+            onClick={() => handleDeleteQuestion(question)}
+            disabled={deleteRiddleMutation.isPending}
           >
-            {isLoading ? "Deleting..." : "Delete Question"}
+            {deleteRiddleMutation.isPending ? "Deleting..." : "Delete Question"}
           </Button>
         </DialogFooter>
       </DialogContent>

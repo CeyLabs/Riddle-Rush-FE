@@ -138,11 +138,9 @@ export function useDeleteRiddle() {
 
   return useMutation({
     mutationFn: async ({
-      riddleId,
-      campaignId,
+      riddleId
     }: {
       riddleId: string;
-      campaignId: string;
     }) => {
       const response = await fetch(`${API_BASE_URL}/riddles/${riddleId}`, {
         method: "DELETE",
@@ -153,12 +151,12 @@ export function useDeleteRiddle() {
         throw new Error(errorData.message || "Failed to delete riddle");
       }
 
-      return { riddleId, campaignId };
+      return { riddleId };
     },
     onSuccess: (data) => {
       // Invalidate and refetch riddles list for this campaign
       queryClient.invalidateQueries({
-        queryKey: ["riddles", data.campaignId],
+        queryKey: ["riddles", data.riddleId],
       });
       toast.success("Riddle deleted successfully", {
         description: "The riddle has been removed from the campaign.",
@@ -166,6 +164,51 @@ export function useDeleteRiddle() {
     },
     onError: (error) => {
       toast.error("Error deleting riddle", {
+        description: error.message || "Something went wrong. Please try again.",
+      });
+    },
+  });
+}
+
+export function useUpdateRiddle() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      riddleId,
+      campaignId,
+      data,
+    }: {
+      riddleId: string;
+      campaignId: string;
+      data: Partial<Omit<Riddle, "id" | "campaign_id">>;
+    }) => {
+      const response = await fetch(`${API_BASE_URL}/riddles/${riddleId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to update riddle");
+      }
+
+      return response.json();
+    },
+    onSuccess: (data, variables) => {
+      // Invalidate and refetch riddles list for this campaign
+      queryClient.invalidateQueries({
+        queryKey: ["riddles", variables.campaignId],
+      });
+      toast.success("Riddle updated successfully", {
+        description: "The riddle has been updated.",
+      });
+    },
+    onError: (error) => {
+      toast.error("Error updating riddle", {
         description: error.message || "Something went wrong. Please try again.",
       });
     },
