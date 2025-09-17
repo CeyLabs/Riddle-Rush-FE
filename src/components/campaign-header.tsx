@@ -28,7 +28,7 @@ export function CampaignHeader({ campaign }: CampaignHeaderProps) {
             size="sm"
             className="flex items-center space-x-2"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="size-4" />
             <span>Back to Campaigns</span>
           </Button>
         </Link>
@@ -42,7 +42,9 @@ export function CampaignHeader({ campaign }: CampaignHeaderProps) {
             </h1>
             <Badge
               variant="secondary"
-              className={`${getStatusColor(campaign.status)} ${getStatusTextColor(campaign.status)}`}
+              className={`${getStatusColor(
+                campaign.status
+              )} ${getStatusTextColor(campaign.status)}`}
             >
               {campaign.status}
             </Badge>
@@ -56,7 +58,7 @@ export function CampaignHeader({ campaign }: CampaignHeaderProps) {
 
           <div className="flex items-center space-x-6 text-sm text-muted-foreground">
             <span className="flex items-center space-x-2">
-              <Calendar className="w-4 h-4" />
+              <Calendar className="size-4" />
               <span>Created {formatDate(campaign.createdAt)}</span>
             </span>
           </div>
@@ -67,7 +69,7 @@ export function CampaignHeader({ campaign }: CampaignHeaderProps) {
           size="sm"
           className="flex items-center space-x-2 bg-transparent"
         >
-          <Settings className="w-4 h-4" />
+          <Settings className="size-4" />
           <span>Settings</span>
         </Button>
       </div>

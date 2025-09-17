@@ -33,10 +33,10 @@ export function DateTimePicker({
 }: DateTimePickerProps) {
   const [open, setOpen] = React.useState(false);
   const [date, setDate] = React.useState<Date | undefined>(
-    value ? new Date(value) : undefined,
+    value ? new Date(value) : undefined
   );
   const [time, setTime] = React.useState(
-    value ? format(new Date(value), "HH:mm") : "09:00",
+    value ? format(new Date(value), "HH:mm") : "09:00"
   );
 
   const today = new Date();
@@ -72,11 +72,11 @@ export function DateTimePicker({
             variant={"outline"}
             className={cn(
               "w-full justify-start text-left font-normal",
-              !date && "text-muted-foreground",
+              !date && "text-muted-foreground"
             )}
             disabled={disabled}
           >
-            <CalendarIcon className="mr-2 h-4 w-4" />
+            <CalendarIcon className="mr-2 size-4" />
             {date ? (
               format(date, "PPP") + " at " + time
             ) : (
@@ -94,7 +94,7 @@ export function DateTimePicker({
               initialFocus
             />
             <div className="flex items-center space-x-2 px-3">
-              <Clock className="h-4 w-4" />
+              <Clock className="size-4" />
               <Label htmlFor="time" className="text-sm">
                 Time:
               </Label>
