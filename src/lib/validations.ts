@@ -6,6 +6,13 @@ export const campaignSchema = z.object({
     .min(1, "Campaign name is required")
     .min(3, "Campaign name must be at least 3 characters")
     .max(50, "Campaign name must be less than 50 characters"),
+  description: z
+    .string()
+    .max(500, "Description must be less than 500 characters")
+    .optional(),
+  language: z.enum(["en", "ar"], {
+    message: "Please select a language",
+  }),
 });
 
 export const questionSchema = z
@@ -30,7 +37,7 @@ export const questionSchema = z
     {
       message: "Answer length is invalid for the selected type",
       path: ["answer"],
-    },
+    }
   )
   .refine(
     (data) => {
@@ -41,7 +48,7 @@ export const questionSchema = z
     {
       message: "End time must be after start time",
       path: ["endTime"],
-    },
+    }
   )
   .refine(
     (data) => {
@@ -52,7 +59,7 @@ export const questionSchema = z
     {
       message: "Start time must be in the future",
       path: ["startTime"],
-    },
+    }
   );
 
 export type CampaignFormData = z.infer<typeof campaignSchema>;

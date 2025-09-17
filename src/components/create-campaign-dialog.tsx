@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -14,10 +13,12 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/lib/store";
 import { campaignSchema, type CampaignFormData } from "@/lib/validations";
-import { toast } from "sonner";
+import { useCreateCampaign } from "@/hooks/use-campaigns";
 
 interface CreateCampaignDialogProps {
   open: boolean;
@@ -28,9 +29,9 @@ export function CreateCampaignDialog({
   open,
   onOpenChange,
 }: CreateCampaignDialogProps) {
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const addCampaign = useAppStore((state) => state.addCampaign);
+  const createCampaignMutation = useCreateCampaign();
 
   const {
     register,
@@ -42,80 +43,121 @@ export function CreateCampaignDialog({
   });
 
   const onSubmit = async (data: CampaignFormData) => {
-    setIsLoading(true);
-
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const payload = {
+        name: data.name,
+        description: data.description,
+        language: data.language,
+        is_active: "true",
+      };
 
+      const result = await createCampaignMutation.mutateAsync(payload);
+
+      // Also update local store for immediate UI feedback
       const campaignId = addCampaign({
         name: data.name,
         status: "draft",
-        description: "A new riddle campaign ready for questions",
-      });
-
-      toast.success("Campaign created successfully", {
-        description: `"${data.name}" has been created and is ready for questions.`,
+        description:
+          data.description || "A new riddle campaign ready for questions",
       });
 
       // Reset form and close dialog
       reset();
       onOpenChange(false);
 
-      router.push(`/campaign/${campaignId}`);
+      // Navigate to the campaign (use API result ID if available, otherwise local store ID)
+      router.push(`/campaign/${result.id || campaignId}`);
     } catch (error) {
-      toast.error("Error creating campaign", {
-        description: "Something went wrong. Please try again.",
-      });
-    } finally {
-      setIsLoading(false);
+      // Error handling is done in the hook
+      console.error("Campaign creation failed:", error);
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[500px]">
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader>
             <DialogTitle>Create New Campaign</DialogTitle>
             <DialogDescription>
-              Give the riddle campaign a name to get started.
+              Create a new riddle campaign with a name, description, and
+              language.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-8">
-              <div>
-                <Input
-                  id="name"
-                  placeholder="Enter campaign name..."
-                  {...register("name")}
-                  className={`transition-all duration-200 ${
-                    errors.name
-                      ? "border-destructive focus:ring-destructive/20"
-                      : "focus:ring-primary/20"
-                  }`}
-                />
-                {errors.name && (
-                  <p className="text-sm text-destructive animate-in slide-in-from-top-1">
-                    {errors.name.message}
-                  </p>
-                )}
-              </div>
+            <div>
+              <Label htmlFor="name" className="text-sm font-medium">
+                Campaign Name
+              </Label>
+              <Input
+                id="name"
+                placeholder="Enter campaign name..."
+                {...register("name")}
+                className={`transition-all duration-200 ${
+                  errors.name
+                    ? "border-destructive focus:ring-destructive/20"
+                    : "focus:ring-primary/20"
+                }`}
+              />
+              {errors.name && (
+                <p className="text-sm text-destructive animate-in slide-in-from-top-1">
+                  {errors.name.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <Label htmlFor="description" className="text-sm font-medium">
+                Description (Optional)
+              </Label>
+              <Textarea
+                id="description"
+                placeholder="Enter campaign description..."
+                {...register("description")}
+                className={`transition-all duration-200 ${
+                  errors.description
+                    ? "border-destructive focus:ring-destructive/20"
+                    : "focus:ring-primary/20"
+                }`}
+              />
+              {errors.description && (
+                <p className="text-sm text-destructive animate-in slide-in-from-top-1">
+                  {errors.description.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <Label htmlFor="language" className="text-sm font-medium">
+                Language
+              </Label>
+              <Select {...register("language")}>
+                <option value="" disabled>
+                  Select a language
+                </option>
+                <option value="en">English</option>
+                <option value="ar">Arabic</option>
+              </Select>
+              {errors.language && (
+                <p className="text-sm text-destructive animate-in slide-in-from-top-1">
+                  {errors.language.message}
+                </p>
+              )}
+            </div>
           </div>
           <DialogFooter>
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={isLoading}
+              disabled={createCampaignMutation.isPending}
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={createCampaignMutation.isPending}
               className="bg-primary text-black hover:bg-primary/90 transition-all duration-200"
             >
-              {isLoading ? (
+              {createCampaignMutation.isPending ? (
                 <div className="flex items-center space-x-2">
                   <div className="size-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
                   <span>Creating...</span>
