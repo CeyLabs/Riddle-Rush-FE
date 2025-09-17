@@ -281,6 +281,7 @@ export function QuestionList({ campaignId }: QuestionListProps) {
       <AddQuestionDialog
         open={isAddDialogOpen}
         onOpenChange={setIsAddDialogOpen}
+        campaignId={campaignId}
         onAddQuestion={handleAddQuestion}
       />
 

@@ -13,6 +13,16 @@ interface Campaign {
   is_active: boolean;
 }
 
+interface Riddle {
+  id: string;
+  campaign_id: string;
+  question: string;
+  answer: string;
+  is_answer_static: boolean;
+  start_date: string;
+  end_date: string;
+}
+
 export function useAllCampaigns() {
   return useQuery({
     queryKey: ["campaigns"],
@@ -55,6 +65,52 @@ export function useCreateCampaign() {
     },
     onError: (error) => {
       toast.error("Error creating campaign", {
+        description: error.message || "Something went wrong. Please try again.",
+      });
+    },
+  });
+}
+
+export function useCreateRiddle() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      campaignId,
+      data,
+    }: {
+      campaignId: string;
+      data: Omit<Riddle, "id" | "campaign_id">;
+    }) => {
+      const response = await fetch(
+        `${API_BASE_URL}/campaigns/${campaignId}/riddles`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to create riddle");
+      }
+
+      return response.json();
+    },
+    onSuccess: (data, variables) => {
+      // Invalidate and refetch riddles list for this campaign
+      queryClient.invalidateQueries({
+        queryKey: ["riddles", variables.campaignId],
+      });
+      toast.success("Riddle created successfully", {
+        description: `"${data.question}" has been added to the campaign.`,
+      });
+    },
+    onError: (error) => {
+      toast.error("Error creating riddle", {
         description: error.message || "Something went wrong. Please try again.",
       });
     },
