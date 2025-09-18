@@ -1,27 +1,28 @@
-import type { TelegramUser } from "@/types/auth";
+import type { TelegramUser, UserRole } from "@/types/auth";
 
-const API_BASE_URL = "http://localhost:3345/api";
+const API_BASE_URL = "http://localhost:3345";
 
 export interface AuthResponse {
   success: boolean;
-  token?: string;
+  access_token?: string;
   user?: {
     id: number;
     telegram_id: number;
     first_name: string;
     username?: string;
-    role: string;
-    permissions: string[];
+    role: UserRole
   };
   message?: string;
 }
 
-export async function authenticateWithBackend(telegramUser: TelegramUser): Promise<AuthResponse> {
+export async function authenticateWithBackend(
+  telegramUser: TelegramUser
+): Promise<AuthResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}/auth/telegram`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         // Send the complete Telegram user object for verification
@@ -42,10 +43,10 @@ export async function authenticateWithBackend(telegramUser: TelegramUser): Promi
     const data: AuthResponse = await response.json();
     return data;
   } catch (error) {
-    console.error('Backend authentication error:', error);
+    console.error("Backend authentication error:", error);
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'Authentication failed',
+      message: error instanceof Error ? error.message : "Authentication failed",
     };
   }
 }
@@ -54,13 +55,13 @@ export async function makeAuthenticatedRequest(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<Response> {
-  const token = localStorage.getItem('auth_token');
+  const token = localStorage.getItem("auth_token");
 
-  return fetch(`${API_BASE_URL}${endpoint}`, {
+  return fetch(`${API_BASE_URL}/api${endpoint}`, {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
       ...options.headers,
     },
   });

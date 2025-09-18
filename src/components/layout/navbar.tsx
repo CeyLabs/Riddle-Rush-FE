@@ -13,7 +13,7 @@ import { LogOut, User } from "lucide-react";
 import Link from "next/link";
 
 export function Navbar() {
-  const { auth, logout } = useAuth();
+  const { auth, logout, isAdmin } = useAuth();
 
   return (
     <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
@@ -33,10 +33,6 @@ export function Navbar() {
             <Popover>
               <PopoverTrigger asChild>
                 <Avatar className="size-8 rounded-md">
-                  <AvatarImage
-                    src={auth.user?.photo_url}
-                    alt={auth.user?.first_name}
-                  />
                   <AvatarFallback>
                     <User className="size-5" />
                   </AvatarFallback>
@@ -45,21 +41,23 @@ export function Navbar() {
               <PopoverContent className="w-64 p-0" align="end">
                 <div className="flex items-center space-x-3 p-4 border-b">
                   <Avatar className="size-12 rounded-md">
-                    <AvatarImage
-                      src={auth.user?.photo_url}
-                      alt={auth.user?.first_name}
-                    />
                     <AvatarFallback>
                       <User className="size-6" />
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
                     <p className="font-medium text-sm">
-                      {auth.user?.first_name} {auth.user?.last_name}
+                      {auth.user?.first_name}
                     </p>
                     {auth.user?.username && (
                       <p className="text-xs text-muted-foreground">
                         @{auth.user.username}
+                      </p>
+                    )}
+                    {auth.user && (
+                      <p className="text-xs text-muted-foreground capitalize">
+                        Role: {auth.user.role}
+                        {isAdmin() && " 👑"}
                       </p>
                     )}
                   </div>

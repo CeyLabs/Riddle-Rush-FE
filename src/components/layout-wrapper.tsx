@@ -8,15 +8,21 @@ const publicRoutes = ["/login"];
 
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { auth } = useAuth();
+  const { auth, isAdmin } = useAuth();
   const router = useRouter();
   const isPublicRoute = publicRoutes.includes(pathname);
 
   useEffect(() => {
-    if (!isPublicRoute && !auth.isLoading && !auth.isAuthenticated) {
-      router.push("/login");
+    if (!isPublicRoute && !auth.isLoading) {
+      if (!auth.isAuthenticated) {
+        // Not authenticated, redirect to login
+        router.push("/login");
+      } else if (!isAdmin()) {
+        // Authenticated but not admin, redirect to login with error
+        router.push("/login");
+      }
     }
-  }, [isPublicRoute, auth.isLoading, auth.isAuthenticated, router]);
+  }, [isPublicRoute, auth.isLoading, auth.isAuthenticated, isAdmin, router]);
 
   if (!isPublicRoute && auth.isLoading) {
     return (
@@ -26,7 +32,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!isPublicRoute && !auth.isAuthenticated) {
+  if (!isPublicRoute && (!auth.isAuthenticated || !isAdmin())) {
     return null;
   }
 

@@ -1,16 +1,20 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import type { AuthState, TelegramUser } from "@/types/auth";
+import { useRouter } from "next/navigation";
+import type { AuthState, TelegramUser, User } from "@/types/auth";
 import { authenticateWithBackend } from "@/services/auth";
 
 const AuthContext = createContext<{
   auth: AuthState;
   login: (user: TelegramUser) => void;
   logout: () => void;
+  isAdmin: () => boolean;
+  requireAdmin: () => boolean;
 } | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const [auth, setAuth] = useState<AuthState>({
     user: null,
     isAuthenticated: false,
@@ -18,16 +22,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   });
 
   useEffect(() => {
-    const stored = localStorage.getItem("telegram_user");
-    if (stored) {
-      try {
-        const user = JSON.parse(stored);
+    const storedUser = localStorage.getItem("user");
 
-        // Also ensure cookie is set if it's missing
-        const cookieExists = document.cookie.includes("telegram_user=");
-        if (!cookieExists) {
-          document.cookie = `telegram_user=${encodeURIComponent(stored)}; path=/; max-age=2592000; SameSite=Lax`;
-        }
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
 
         setAuth({
           user,
@@ -35,59 +34,65 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           isLoading: false,
         });
       } catch {
-        localStorage.removeItem("telegram_user");
-        document.cookie = "telegram_user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-        setAuth((prev) => ({ ...prev, isLoading: false }));
+        localStorage.removeItem("user");
+        localStorage.removeItem("auth_token");
+        setAuth({
+          user: null,
+          isAuthenticated: false,
+          isLoading: false,
+        });
       }
     } else {
-      setAuth((prev) => ({ ...prev, isLoading: false }));
+      setAuth({
+        user: null,
+        isAuthenticated: false,
+        isLoading: false,
+      });
     }
   }, []);
 
   const login = async (user: TelegramUser) => {
-    setAuth(prev => ({ ...prev, isLoading: true }));
+    setAuth((prev) => ({ ...prev, isLoading: true }));
 
     try {
       // Authenticate with backend
       const authResponse = await authenticateWithBackend(user);
 
-      if (authResponse.success && authResponse.token) {
+      if (
+        authResponse.success &&
+        authResponse.access_token &&
+        authResponse.user
+      ) {
         // Store auth token
-        localStorage.setItem("auth_token", authResponse.token);
+        localStorage.setItem("auth_token", authResponse.access_token);
 
-        // Store user data
-        const userData = JSON.stringify(user);
-        localStorage.setItem("telegram_user", userData);
-
-        // Also set cookie for middleware
-        document.cookie = `telegram_user=${encodeURIComponent(userData)}; path=/; max-age=2592000; SameSite=Lax`;
+        // Store user data (the backend user with role)
+        const userData = JSON.stringify(authResponse.user);
+        localStorage.setItem("user", userData);
 
         setAuth({
-          user,
+          user: authResponse.user,
           isAuthenticated: true,
           isLoading: false,
         });
       } else {
-        throw new Error(authResponse.message || 'Authentication failed');
+        throw new Error(authResponse.message || "Authentication failed");
       }
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error("Login failed:", error);
       setAuth({
         user: null,
         isAuthenticated: false,
         isLoading: false,
       });
       // You might want to show a toast notification here
-      alert('Login failed. Please try again.');
+      alert("Login failed. Please try again.");
     }
   };
 
   const logout = () => {
-    localStorage.removeItem("telegram_user");
+    localStorage.removeItem("user");
     localStorage.removeItem("auth_token");
-
-    // Also remove cookie
-    document.cookie = "telegram_user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
 
     setAuth({
       user: null,
@@ -96,8 +101,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  const isAdmin = () => {
+    return auth.user?.role === "admin";
+  };
+
+  const requireAdmin = () => {
+    if (!auth.isAuthenticated || !auth.user) {
+      router.push("/login");
+      return false;
+    }
+
+    if (!isAdmin()) {
+      // Don't show alert, let the login page handle the error display
+      return false;
+    }
+
+    return true;
+  };
+
   return (
-    <AuthContext.Provider value={{ auth, login, logout }}>
+    <AuthContext.Provider
+      value={{ auth, login, logout, isAdmin, requireAdmin }}
+    >
       {children}
     </AuthContext.Provider>
   );

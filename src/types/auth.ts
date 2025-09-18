@@ -8,8 +8,18 @@ export interface TelegramUser {
   hash: string;
 }
 
+export type UserRole = "admin" | "regular";
+
+export interface User {
+  id: number;
+  telegram_id: number;
+  first_name: string;
+  username?: string;
+  role: UserRole;
+}
+
 export interface AuthState {
-  user: TelegramUser | null;
+  user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
 }
