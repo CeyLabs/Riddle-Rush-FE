@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import type { AuthState, TelegramUser } from "@/types/auth";
+import { authenticateWithBackend } from "@/services/auth";
 
 const AuthContext = createContext<{
   auth: AuthState;
@@ -43,24 +44,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const login = (user: TelegramUser) => {
-    const userData = JSON.stringify(user);
+  const login = async (user: TelegramUser) => {
+    setAuth(prev => ({ ...prev, isLoading: true }));
 
-    // Store in localStorage
-    localStorage.setItem("telegram_user", userData);
+    try {
+      // Authenticate with backend
+      const authResponse = await authenticateWithBackend(user);
 
-    // Also set cookie for middleware
-    document.cookie = `telegram_user=${encodeURIComponent(userData)}; path=/; max-age=2592000; SameSite=Lax`;
+      if (authResponse.success && authResponse.token) {
+        // Store auth token
+        localStorage.setItem("auth_token", authResponse.token);
 
-    setAuth({
-      user,
-      isAuthenticated: true,
-      isLoading: false,
-    });
+        // Store user data
+        const userData = JSON.stringify(user);
+        localStorage.setItem("telegram_user", userData);
+
+        // Also set cookie for middleware
+        document.cookie = `telegram_user=${encodeURIComponent(userData)}; path=/; max-age=2592000; SameSite=Lax`;
+
+        setAuth({
+          user,
+          isAuthenticated: true,
+          isLoading: false,
+        });
+      } else {
+        throw new Error(authResponse.message || 'Authentication failed');
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+      setAuth({
+        user: null,
+        isAuthenticated: false,
+        isLoading: false,
+      });
+      // You might want to show a toast notification here
+      alert('Login failed. Please try again.');
+    }
   };
 
   const logout = () => {
     localStorage.removeItem("telegram_user");
+    localStorage.removeItem("auth_token");
 
     // Also remove cookie
     document.cookie = "telegram_user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
