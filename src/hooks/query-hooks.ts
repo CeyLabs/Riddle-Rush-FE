@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-const API_BASE_URL = 'http://localhost:3344/api';
+const API_BASE_URL = "http://localhost:3344/api";
 
 type SupportedLanguages = "en" | "ar";
 
@@ -21,6 +21,15 @@ interface Riddle {
   is_answer_static: boolean;
   start_date: string;
   end_date: string;
+}
+
+interface LeaderboardEntry {
+  id: string;
+  campaign_id: string;
+  username: string;
+  score: number;
+  completed_at: string;
+  time_spent: number; // in seconds
 }
 
 export function useAllCampaigns() {
@@ -137,11 +146,7 @@ export function useDeleteRiddle() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      riddleId
-    }: {
-      riddleId: string;
-    }) => {
+    mutationFn: async ({ riddleId }: { riddleId: string }) => {
       const response = await fetch(`${API_BASE_URL}/riddles/${riddleId}`, {
         method: "DELETE",
       });
@@ -212,5 +217,21 @@ export function useUpdateRiddle() {
         description: error.message || "Something went wrong. Please try again.",
       });
     },
+  });
+}
+
+export function useCampaignLeaderboard(campaignId: string) {
+  return useQuery({
+    queryKey: ["leaderboard", campaignId],
+    queryFn: async (): Promise<LeaderboardEntry[]> => {
+      const response = await fetch(
+        `${API_BASE_URL}/campaigns/${campaignId}/leaderboard?limit=10`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch leaderboard");
+      }
+      return response.json();
+    },
+    enabled: !!campaignId, // Only fetch if campaignId is provided
   });
 }
