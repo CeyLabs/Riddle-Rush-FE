@@ -19,7 +19,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { questionSchema, type QuestionFormData } from "@/lib/validations";
 import { useUpdateRiddle } from "@/hooks/query-hooks";
-import { toast } from "sonner";
 
 interface Question {
   id: string;

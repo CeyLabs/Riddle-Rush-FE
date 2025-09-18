@@ -15,7 +15,6 @@ import { Button } from "@/components/ui/button";
 import {
   Plus,
   Search,
-  Calendar,
   Clock,
   FileText,
   Trophy,
@@ -24,7 +23,7 @@ import {
   List,
 } from "lucide-react";
 import { CreateCampaignDialog } from "@/components/create-campaign-dialog";
-import { formatDate, getStatusColor, getStatusTextColor } from "@/lib/utils";
+import { getStatusColor, getStatusTextColor } from "@/lib/utils";
 import { useAllCampaigns } from "@/hooks/query-hooks";
 import Link from "next/link";
 

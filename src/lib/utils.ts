@@ -40,8 +40,10 @@ export function getStatusColor(status: string) {
     case "active":
       return "bg-green-500 hover:bg-green-600";
     case "completed":
+    case "ended":
       return "bg-blue-500 hover:bg-blue-600";
     case "draft":
+    case "upcoming":
       return "bg-yellow-500 hover:bg-yellow-600";
     default:
       return "bg-gray-500 hover:bg-gray-600";
@@ -51,9 +53,14 @@ export function getStatusColor(status: string) {
 export function getStatusTextColor(status: string) {
   switch (status) {
     case "draft":
+    case "upcoming":
       return "text-black"; // Black text on yellow background for better contrast
+    case "completed":
+    case "ended":
+      return "text-white"; // White text on blue background
+    case "active":
     default:
-      return "text-white"; // White text for other status colors
+      return "text-white"; // White text for green and other status colors
   }
 }
 
