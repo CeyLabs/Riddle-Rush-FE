@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -18,6 +17,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { questionSchema, type QuestionFormData } from "@/lib/validations";
+import { useCreateRiddle } from "@/hooks/query-hooks";
 import { toast } from "sonner";
 
 interface Question {
@@ -31,15 +31,17 @@ interface Question {
 interface AddQuestionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onAddQuestion: (question: Question) => void;
+  campaignId: string;
+  onAddQuestion?: (question: Question) => void;
 }
 
 export function AddQuestionDialog({
   open,
   onOpenChange,
+  campaignId,
   onAddQuestion,
 }: AddQuestionDialogProps) {
-  const [isLoading, setIsLoading] = useState(false);
+  const createRiddleMutation = useCreateRiddle();
 
   const {
     register,
@@ -59,28 +61,26 @@ export function AddQuestionDialog({
   const answerType = watch("answerType");
 
   const onSubmit = async (data: QuestionFormData) => {
-    setIsLoading(true);
+    const riddleData = {
+      question: data.question,
+      answer: data.answer,
+      is_answer_static: data.answerType === "static",
+      start_date: data.startTime,
+      end_date: data.endTime,
+    };
 
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      onAddQuestion(data);
-
-      toast.success("Question added successfully", {
-        description: "Your riddle question has been added to the project.",
-      });
-
-      // Reset form and close dialog
-      reset();
-      onOpenChange(false);
-    } catch (error) {
-      toast.error("Error adding question", {
-        description: "Something went wrong. Please try again.",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    createRiddleMutation.mutate(
+      { campaignId, data: riddleData },
+      {
+        onSuccess: () => {
+          // Reset form and close dialog
+          reset();
+          onOpenChange(false);
+          // Call optional callback if provided
+          onAddQuestion?.(data);
+        },
+      },
+    );
   };
 
   return (
@@ -220,10 +220,10 @@ export function AddQuestionDialog({
             </Button>
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={createRiddleMutation.isPending}
               className="bg-primary text-black hover:bg-primary/90"
             >
-              {isLoading ? "Adding..." : "Add Question"}
+              {createRiddleMutation.isPending ? "Adding..." : "Add Question"}
             </Button>
           </DialogFooter>
         </form>

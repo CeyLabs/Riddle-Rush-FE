@@ -1,10 +1,8 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, Calendar, Settings } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { getStatusColor, getStatusTextColor, formatDate } from "@/lib/utils";
-import Link from "next/link";
 
 interface Campaign {
   id: string;
@@ -21,19 +19,6 @@ interface CampaignHeaderProps {
 export function CampaignHeader({ campaign }: CampaignHeaderProps) {
   return (
     <div className="mb-8">
-      <div className="flex items-center space-x-4 mb-4">
-        <Link href="/">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex items-center space-x-2"
-          >
-            <ArrowLeft className="size-4" />
-            <span>Back to Campaigns</span>
-          </Button>
-        </Link>
-      </div>
-
       <div className="flex items-start justify-between">
         <div className="space-y-4">
           <div className="flex items-center space-x-4">
@@ -43,7 +28,7 @@ export function CampaignHeader({ campaign }: CampaignHeaderProps) {
             <Badge
               variant="secondary"
               className={`${getStatusColor(
-                campaign.status
+                campaign.status,
               )} ${getStatusTextColor(campaign.status)}`}
             >
               {campaign.status}
@@ -63,15 +48,6 @@ export function CampaignHeader({ campaign }: CampaignHeaderProps) {
             </span>
           </div>
         </div>
-
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex items-center space-x-2 bg-transparent"
-        >
-          <Settings className="size-4" />
-          <span>Settings</span>
-        </Button>
       </div>
     </div>
   );

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,54 +9,37 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useDeleteRiddle } from "@/hooks/query-hooks";
 import { AlertTriangle } from "lucide-react";
-import { toast } from "sonner";
 
 interface Question {
   id: string;
+  campaign_id: string;
   question: string;
-  answerType: "static" | "ai-validated";
   answer: string;
-  startTime: string;
-  endTime: string;
-  status: "upcoming" | "active" | "ended";
+  is_answer_static: boolean;
+  start_date: string;
+  end_date: string;
 }
 
 interface DeleteQuestionDialogProps {
   question: Question;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onDeleteQuestion: (questionId: string) => void;
 }
 
 export function DeleteQuestionDialog({
   question,
   open,
   onOpenChange,
-  onDeleteQuestion,
 }: DeleteQuestionDialogProps) {
-  const [isLoading, setIsLoading] = useState(false);
+  const deleteRiddleMutation = useDeleteRiddle();
 
-  const handleDelete = async () => {
-    setIsLoading(true);
-
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      onDeleteQuestion(question.id);
-
-      toast.success("Question deleted successfully", {
-        description: "The riddle question has been removed from your project.",
-      });
-
-      setIsLoading(false);
-    } catch (error) {
-      toast.error("Error deleting question", {
-        description: "Something went wrong. Please try again.",
-      });
-      setIsLoading(false);
-    }
+  const handleDeleteQuestion = (question: Question) => {
+    deleteRiddleMutation.mutate({
+      riddleId: question.id,
+      campaignId: question.campaign_id,
+    });
   };
 
   return (
@@ -87,16 +69,16 @@ export function DeleteQuestionDialog({
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
-            disabled={isLoading}
+            disabled={deleteRiddleMutation.isPending}
           >
             Cancel
           </Button>
           <Button
             variant="destructive"
-            onClick={handleDelete}
-            disabled={isLoading}
+            onClick={() => handleDeleteQuestion(question)}
+            disabled={deleteRiddleMutation.isPending}
           >
-            {isLoading ? "Deleting..." : "Delete Question"}
+            {deleteRiddleMutation.isPending ? "Deleting..." : "Delete Question"}
           </Button>
         </DialogFooter>
       </DialogContent>

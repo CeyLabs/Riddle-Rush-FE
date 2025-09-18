@@ -6,6 +6,13 @@ export const campaignSchema = z.object({
     .min(1, "Campaign name is required")
     .min(3, "Campaign name must be at least 3 characters")
     .max(50, "Campaign name must be less than 50 characters"),
+  description: z
+    .string()
+    .max(500, "Description must be less than 500 characters")
+    .optional(),
+  language: z.enum(["en", "ar"], {
+    message: "Please select a language",
+  }),
 });
 
 export const questionSchema = z

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,19 +16,11 @@ import {
 import { AddQuestionDialog } from "@/components/add-question-dialog";
 import { EditQuestionDialog } from "@/components/edit-question-dialog";
 import { DeleteQuestionDialog } from "@/components/delete-question-dialog";
-import { useAppStore } from "@/lib/store";
 import { formatDate, getStatusColor, getStatusTextColor } from "@/lib/utils";
-
-interface Question {
-  id: string;
-  campaignId: string;
-  question: string;
-  answerType: "static" | "ai-validated";
-  answer: string;
-  startTime: string;
-  endTime: string;
-  status: "upcoming" | "active" | "ended";
-}
+import {
+  useCampaignRiddles,
+  type Riddle as Question,
+} from "@/hooks/query-hooks";
 
 interface QuestionListProps {
   campaignId: string;
@@ -38,65 +30,64 @@ export function QuestionList({ campaignId }: QuestionListProps) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [deletingQuestion, setDeletingQuestion] = useState<Question | null>(
-    null
+    null,
   );
-  const [isLoading, setIsLoading] = useState(true);
 
   const {
-    questions,
-    addQuestion,
-    updateQuestion,
-    deleteQuestion,
-    getCampaignQuestions,
-  } = useAppStore();
-  const campaignQuestions = getCampaignQuestions(campaignId);
+    data: questions = [],
+    isLoading,
+    error,
+    refetch,
+  } = useCampaignRiddles(campaignId);
 
-  useEffect(() => {
-    console.log("[v0] Campaign ID:", campaignId);
-    console.log("[v0] All questions:", questions);
-    console.log("[v0] Campaign questions:", campaignQuestions);
-    const timer = setTimeout(() => setIsLoading(false), 1000);
-    return () => clearTimeout(timer);
-  }, [campaignId, questions, campaignQuestions]);
+  const getStatusIcon = (
+    isActive: boolean,
+    startDate: string,
+    endDate: string,
+  ) => {
+    const now = new Date();
+    const start = new Date(startDate);
+    const end = new Date(endDate);
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "active":
-        return <Clock className="size-4" />;
-      case "upcoming":
-        return <AlertCircle className="size-4" />;
-      case "ended":
-        return <CheckCircle className="size-4" />;
-      default:
-        return <Clock className="size-4" />;
+    if (now < start) {
+      return <AlertCircle className="size-4" />; // upcoming
+    } else if (now >= start && now <= end) {
+      return <Clock className="size-4" />; // active
+    } else {
+      return <CheckCircle className="size-4" />; // ended
     }
   };
 
-  const handleAddQuestion = (
-    newQuestion: Omit<Question, "id" | "status" | "campaignId">
-  ) => {
-    addQuestion({ ...newQuestion, campaignId });
+  const getQuestionStatus = (startDate: string, endDate: string) => {
+    const now = new Date();
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (now < start) {
+      return "upcoming";
+    } else if (now >= start && now <= end) {
+      return "active";
+    } else {
+      return "ended";
+    }
   };
 
-  const handleEditQuestion = (updatedQuestion: Question) => {
-    updateQuestion(updatedQuestion.id, updatedQuestion);
-    setEditingQuestion(null);
-  };
-
-  const handleDeleteQuestion = (questionId: string) => {
-    deleteQuestion(questionId);
-    setDeletingQuestion(null);
-  };
-
-  const formatDateTime = (dateString: string) => {
-    const date = new Date(dateString);
-    const formattedDate = formatDate(dateString);
-    const time = date.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    return `${formattedDate} at ${time}`;
-  };
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <div className="w-16 h-16 rounded-full bg-destructive/10 mx-auto mb-4 flex items-center justify-center">
+          <AlertCircle className="w-8 h-8 text-destructive" />
+        </div>
+        <h3 className="text-xl font-semibold mb-2">Failed to load questions</h3>
+        <p className="text-muted-foreground mb-4">
+          {error instanceof Error
+            ? error.message
+            : "Something went wrong while fetching questions."}
+        </p>
+        <Button onClick={() => refetch()}>Try Again</Button>
+      </div>
+    );
+  }
 
   const QuestionSkeleton = () => (
     <Card>
@@ -167,7 +158,7 @@ export function QuestionList({ campaignId }: QuestionListProps) {
         </Button>
       </div>
 
-      {campaignQuestions.length === 0 ? (
+      {questions.length === 0 ? (
         <Card className="border-dashed border-2 hover:border-primary/50 transition-colors duration-200">
           <CardContent className="flex flex-col items-center justify-center py-12 space-y-4">
             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
@@ -191,7 +182,7 @@ export function QuestionList({ campaignId }: QuestionListProps) {
         </Card>
       ) : (
         <div className="grid gap-4">
-          {campaignQuestions.map((question, index) => (
+          {questions.map((question, index) => (
             <Card
               key={question.id}
               className="hover:shadow-lg transition-all duration-200 hover:scale-[1.01] group gap-3"
@@ -212,21 +203,36 @@ export function QuestionList({ campaignId }: QuestionListProps) {
                     </div>
                     <div className="flex flex-wrap items-center gap-2 ml-12">
                       <Badge variant="outline" className="text-xs">
-                        {question.answerType === "static"
+                        {question.is_answer_static
                           ? "Static Answer"
                           : "AI Validated"}
                       </Badge>
                       <Badge
                         variant="secondary"
                         className={`${getStatusColor(
-                          question.status
+                          getQuestionStatus(
+                            question.start_date,
+                            question.end_date,
+                          ),
                         )} ${getStatusTextColor(
-                          question.status
+                          getQuestionStatus(
+                            question.start_date,
+                            question.end_date,
+                          ),
                         )} text-xs transition-colors duration-200`}
                       >
                         <span className="flex items-center space-x-1">
-                          {getStatusIcon(question.status)}
-                          <span className="capitalize">{question.status}</span>
+                          {getStatusIcon(
+                            question.is_answer_static,
+                            question.start_date,
+                            question.end_date,
+                          )}
+                          <span className="capitalize">
+                            {getQuestionStatus(
+                              question.start_date,
+                              question.end_date,
+                            )}
+                          </span>
                         </span>
                       </Badge>
                     </div>
@@ -264,11 +270,11 @@ export function QuestionList({ campaignId }: QuestionListProps) {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-muted-foreground ml-12">
                     <span className="flex items-center space-x-1">
                       <Clock className="w-3 h-3" />
-                      <span>Start: {formatDateTime(question.startTime)}</span>
+                      <span>Start: {formatDate(question.start_date)}</span>
                     </span>
                     <span className="flex items-center space-x-1">
                       <CheckCircle className="w-3 h-3" />
-                      <span>End: {formatDateTime(question.endTime)}</span>
+                      <span>End: {formatDate(question.end_date)}</span>
                     </span>
                   </div>
                 </div>
@@ -281,24 +287,22 @@ export function QuestionList({ campaignId }: QuestionListProps) {
       <AddQuestionDialog
         open={isAddDialogOpen}
         onOpenChange={setIsAddDialogOpen}
-        onAddQuestion={handleAddQuestion}
+        campaignId={campaignId}
       />
-
-      {editingQuestion && (
-        <EditQuestionDialog
-          question={editingQuestion}
-          open={!!editingQuestion}
-          onOpenChange={(open) => !open && setEditingQuestion(null)}
-          onEditQuestion={handleEditQuestion}
-        />
-      )}
 
       {deletingQuestion && (
         <DeleteQuestionDialog
           question={deletingQuestion}
           open={!!deletingQuestion}
           onOpenChange={(open) => !open && setDeletingQuestion(null)}
-          onDeleteQuestion={handleDeleteQuestion}
+        />
+      )}
+
+      {editingQuestion && (
+        <EditQuestionDialog
+          question={editingQuestion}
+          open={!!editingQuestion}
+          onOpenChange={(open) => !open && setEditingQuestion(null)}
         />
       )}
     </div>

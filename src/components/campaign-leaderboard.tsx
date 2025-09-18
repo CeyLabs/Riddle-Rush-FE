@@ -8,19 +8,63 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Trophy, Clock, Calendar } from "lucide-react";
-import { useAppStore } from "@/lib/store";
 import { formatDate, formatTime } from "@/lib/utils";
-import { getRankIcon, getScoreColor } from "@/lib/utils"; // Added imports for getRankIcon and getScoreColor
+import { getRankIcon, getScoreColor } from "@/lib/utils";
+import { useCampaignLeaderboard } from "@/hooks/query-hooks";
 
 interface CampaignLeaderboardProps {
   campaignId: string;
 }
 
 export function CampaignLeaderboard({ campaignId }: CampaignLeaderboardProps) {
-  const getCampaignLeaderboard = useAppStore(
-    (state) => state.getCampaignLeaderboard,
-  );
-  const leaderboard = getCampaignLeaderboard(campaignId);
+  const {
+    data: leaderboard = [],
+    isLoading,
+    error,
+  } = useCampaignLeaderboard(campaignId);
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Trophy className="w-5 h-5 text-primary" />
+            <span>Leaderboard</span>
+          </CardTitle>
+          <CardDescription>Top performers for this campaign</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading leaderboard...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Trophy className="w-5 h-5 text-primary" />
+            <span>Leaderboard</span>
+          </CardTitle>
+          <CardDescription>Top performers for this campaign</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <Trophy className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">Failed to load leaderboard</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Please try again later
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (leaderboard.length === 0) {
     return (
@@ -74,11 +118,11 @@ export function CampaignLeaderboard({ campaignId }: CampaignLeaderboardProps) {
                   <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                     <span className="flex items-center space-x-1">
                       <Calendar className="w-3 h-3" />
-                      <span>{formatDate(entry.completedAt)}</span>
+                      <span>{formatDate(entry.completed_at)}</span>
                     </span>
                     <span className="flex items-center space-x-1">
                       <Clock className="w-3 h-3" />
-                      <span>{formatTime(entry.timeSpent)}</span>
+                      <span>{formatTime(entry.time_spent)}</span>
                     </span>
                   </div>
                 </div>

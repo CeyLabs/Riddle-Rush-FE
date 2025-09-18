@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -18,33 +18,30 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { questionSchema, type QuestionFormData } from "@/lib/validations";
-import { toast } from "sonner";
+import { useUpdateRiddle } from "@/hooks/query-hooks";
 
 interface Question {
   id: string;
-  campaignId: string;
+  campaign_id: string;
   question: string;
-  answerType: "static" | "ai-validated";
   answer: string;
-  startTime: string;
-  endTime: string;
-  status: "upcoming" | "active" | "ended";
+  is_answer_static: boolean;
+  start_date: string;
+  end_date: string;
 }
 
 interface EditQuestionDialogProps {
   question: Question;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onEditQuestion: (question: Question) => void;
 }
 
 export function EditQuestionDialog({
   question,
   open,
   onOpenChange,
-  onEditQuestion,
 }: EditQuestionDialogProps) {
-  const [isLoading, setIsLoading] = useState(false);
+  const updateRiddleMutation = useUpdateRiddle();
 
   const {
     register,
@@ -64,37 +61,37 @@ export function EditQuestionDialog({
     if (question) {
       reset({
         question: question.question,
-        answerType: question.answerType,
+        answerType: question.is_answer_static ? "static" : "ai-validated",
         answer: question.answer,
-        startTime: question.startTime,
-        endTime: question.endTime,
+        startTime: question.start_date,
+        endTime: question.end_date,
       });
     }
   }, [question, reset]);
 
   const onSubmit = async (data: QuestionFormData) => {
-    setIsLoading(true);
+    const riddleData = {
+      question: data.question,
+      answer: data.answer,
+      is_answer_static: data.answerType === "static",
+      start_date: data.startTime,
+      end_date: data.endTime,
+    };
 
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      onEditQuestion({
-        ...question,
-        ...data,
-      });
-
-      toast.success("Question updated successfully", {
-        description: "Your riddle question has been updated.",
-      });
-
-      setIsLoading(false);
-    } catch (error) {
-      toast.error("Error updating question", {
-        description: "Something went wrong. Please try again.",
-      });
-      setIsLoading(false);
-    }
+    updateRiddleMutation.mutate(
+      {
+        riddleId: question.id,
+        campaignId: question.campaign_id,
+        data: riddleData,
+      },
+      {
+        onSuccess: () => {
+          // Reset form and close dialog
+          reset();
+          onOpenChange(false);
+        },
+      },
+    );
   };
 
   return (
@@ -234,10 +231,12 @@ export function EditQuestionDialog({
             </Button>
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={updateRiddleMutation.isPending}
               className="bg-primary text-black hover:bg-primary/90"
             >
-              {isLoading ? "Updating..." : "Update Question"}
+              {updateRiddleMutation.isPending
+                ? "Updating..."
+                : "Update Question"}
             </Button>
           </DialogFooter>
         </form>

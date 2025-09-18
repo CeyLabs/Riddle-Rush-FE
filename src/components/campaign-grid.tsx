@@ -15,7 +15,6 @@ import { Button } from "@/components/ui/button";
 import {
   Plus,
   Search,
-  Calendar,
   Clock,
   FileText,
   Trophy,
@@ -24,21 +23,22 @@ import {
   List,
 } from "lucide-react";
 import { CreateCampaignDialog } from "@/components/create-campaign-dialog";
-import { useAppStore } from "@/lib/store";
-import { formatDate, getStatusColor, getStatusTextColor } from "@/lib/utils";
+import { getStatusColor, getStatusTextColor } from "@/lib/utils";
+import { useAllCampaigns } from "@/hooks/query-hooks";
 import Link from "next/link";
 
 export function CampaignGrid() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const campaigns = useAppStore((state) => state.campaigns);
-  const viewMode = useAppStore((state) => state.viewMode);
-  const setViewMode = useAppStore((state) => state.setViewMode);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const { data: campaigns = [], isLoading, error, refetch } = useAllCampaigns();
 
   const filteredCampaigns = campaigns.filter((campaign) =>
-    campaign.name.toLowerCase().includes(searchTerm.toLowerCase())
+    campaign.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
+
+  const getDisplayStatus = (isActive: boolean) =>
+    isActive ? "active" : "draft";
 
   const isBlockchainProject = (name: string) => {
     const blockchainKeywords = [
@@ -51,7 +51,7 @@ export function CampaignGrid() {
       "web3",
     ];
     return blockchainKeywords.some((keyword) =>
-      name.toLowerCase().includes(keyword)
+      name.toLowerCase().includes(keyword),
     );
   };
 
@@ -134,6 +134,23 @@ export function CampaignGrid() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <div className="w-16 h-16 rounded-full bg-destructive/10 mx-auto mb-4 flex items-center justify-center">
+          <FileText className="w-8 h-8 text-destructive" />
+        </div>
+        <h3 className="text-xl font-semibold mb-2">Failed to load campaigns</h3>
+        <p className="text-muted-foreground mb-4">
+          {error instanceof Error
+            ? error.message
+            : "Something went wrong while fetching campaigns."}
+        </p>
+        <Button onClick={() => refetch()}>Try Again</Button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Search and View Toggle */}
@@ -210,26 +227,32 @@ export function CampaignGrid() {
                     <Badge
                       variant="secondary"
                       className={`${getStatusColor(
-                        campaign.status
+                        getDisplayStatus(campaign.is_active),
                       )} ${getStatusTextColor(
-                        campaign.status
+                        getDisplayStatus(campaign.is_active),
                       )} transition-colors duration-200`}
                     >
-                      {campaign.status}
+                      {getDisplayStatus(campaign.is_active)}
                     </Badge>
                   </div>
                   <CardDescription className="flex items-center space-x-4 text-sm">
                     <span className="flex items-center space-x-1">
-                      <Calendar className="size-4" />
-                      <span>{formatDate(campaign.createdAt)}</span>
+                      <span className="text-muted-foreground">
+                        Language: {campaign.language.toUpperCase()}
+                      </span>
                     </span>
+                    {campaign.description && (
+                      <span className="text-xs text-muted-foreground line-clamp-2">
+                        {campaign.description}
+                      </span>
+                    )}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground flex items-center space-x-1">
                       <FileText className="size-4" />
-                      <span>{campaign.questionCount} questions</span>
+                      <span>0 questions</span>
                     </span>
                     <Clock className="size-4 text-muted-foreground group-hover:text-primary transition-colors duration-200" />
                   </div>
@@ -239,7 +262,7 @@ export function CampaignGrid() {
           ))}
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="flex flex-col space-y-4">
           <Card
             className="border-dashed border-2 border-primary hover:bg-primary/10 cursor-pointer transition-all duration-200 p-4 group"
             onClick={() => setIsCreateDialogOpen(true)}
@@ -272,22 +295,21 @@ export function CampaignGrid() {
                     <Badge
                       variant="secondary"
                       className={`${getStatusColor(
-                        campaign.status
+                        getDisplayStatus(campaign.is_active),
                       )} ${getStatusTextColor(
-                        campaign.status
+                        getDisplayStatus(campaign.is_active),
                       )} transition-colors duration-200`}
                     >
-                      {campaign.status}
+                      {getDisplayStatus(campaign.is_active)}
                     </Badge>
                   </div>
                   <div className="flex items-center space-x-6 text-sm text-muted-foreground">
                     <span className="flex items-center space-x-1">
-                      <Calendar className="size-4" />
-                      <span>{formatDate(campaign.createdAt)}</span>
+                      <span>Language: {campaign.language.toUpperCase()}</span>
                     </span>
                     <span className="flex items-center space-x-1">
                       <FileText className="size-4" />
-                      <span>{campaign.questionCount} questions</span>
+                      <span>0 questions</span>
                     </span>
                     <Trophy className="size-4 group-hover:text-primary transition-colors duration-200" />
                   </div>

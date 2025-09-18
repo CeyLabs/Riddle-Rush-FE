@@ -1,5 +1,3 @@
-"use client";
-
 import { Navbar } from "@/components/layout/navbar";
 import { CampaignHeader } from "@/components/campaign-header";
 import { QuestionList } from "@/components/question-list";
@@ -13,10 +11,10 @@ const getCampaign = (id: string) => ({
     id === "1"
       ? "Math Riddles Challenge"
       : id === "2"
-      ? "Logic Puzzles"
-      : id === "4"
-      ? "Blockchain & Crypto Quiz"
-      : "New Campaign",
+        ? "Logic Puzzles"
+        : id === "4"
+          ? "Blockchain & Crypto Quiz"
+          : "New Campaign",
   createdAt: "2024-01-15",
   status: "active" as const,
   description:
