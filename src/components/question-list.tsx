@@ -19,8 +19,6 @@ import { DeleteQuestionDialog } from "@/components/delete-question-dialog";
 import { formatDate, getStatusColor, getStatusTextColor } from "@/lib/utils";
 import {
   useCampaignRiddles,
-  useDeleteRiddle,
-  useUpdateRiddle,
 } from "@/hooks/query-hooks";
 
 interface Question {
@@ -47,7 +45,7 @@ export function QuestionList({ campaignId }: QuestionListProps) {
   const {
     data: questions = [],
     isLoading,
-    error,
+    error, refetch
   } = useCampaignRiddles(campaignId);
 
 
@@ -96,7 +94,7 @@ export function QuestionList({ campaignId }: QuestionListProps) {
         <p className="text-muted-foreground mb-4">
           {error.message || "Something went wrong while fetching questions."}
         </p>
-        <Button onClick={() => window.location.reload()}>Try Again</Button>
+        <Button onClick={() => refetch()}>Try Again</Button>
       </div>
     );
   }

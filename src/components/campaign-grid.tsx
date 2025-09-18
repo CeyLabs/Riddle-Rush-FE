@@ -32,7 +32,7 @@ export function CampaignGrid() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const { data: campaigns = [], isLoading, error } = useAllCampaigns();
+  const { data: campaigns = [], isLoading, error, refetch } = useAllCampaigns();
 
   const filteredCampaigns = campaigns.filter((campaign) =>
     campaign.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -145,7 +145,7 @@ export function CampaignGrid() {
         <p className="text-muted-foreground mb-4">
           {error.message || "Something went wrong while fetching campaigns."}
         </p>
-        <Button onClick={() => window.location.reload()}>Try Again</Button>
+        <Button onClick={() => refetch()}>Try Again</Button>
       </div>
     );
   }
