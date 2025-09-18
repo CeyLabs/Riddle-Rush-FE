@@ -263,7 +263,7 @@ export function CampaignGrid() {
           ))}
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="flex flex-col space-y-4">
           <Card
             className="border-dashed border-2 border-primary hover:bg-primary/10 cursor-pointer transition-all duration-200 p-4 group"
             onClick={() => setIsCreateDialogOpen(true)}
