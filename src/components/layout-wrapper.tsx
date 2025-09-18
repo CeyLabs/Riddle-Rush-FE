@@ -10,29 +10,46 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { auth, isAdmin } = useAuth();
   const router = useRouter();
-  const isPublicRoute = publicRoutes.includes(pathname);
 
   useEffect(() => {
-    if (!isPublicRoute && !auth.isLoading) {
-      if (!auth.isAuthenticated) {
-        // Not authenticated, redirect to login
-        router.push("/login");
-      } else if (!isAdmin()) {
-        // Authenticated but not admin, redirect to login with error
-        router.push("/login");
-      }
+    if (auth.isLoading) {
+      return;
     }
-  }, [isPublicRoute, auth.isLoading, auth.isAuthenticated, isAdmin, router]);
 
-  if (!isPublicRoute && auth.isLoading) {
+    if (pathname === "/login") {
+      if (auth.isAuthenticated && isAdmin()) {
+        router.replace("/");
+      }
+      return;
+    }
+
+    // For all other pages (protected routes)
+    if (!auth.isAuthenticated) {
+      router.push("/login");
+      return;
+    }
+
+    if (!isAdmin()) {
+      router.push("/login");
+      return;
+    }
+  }, [pathname, auth.isLoading, auth.isAuthenticated, isAdmin, router]);
+
+  // Show loading spinner while checking auth on protected routes
+  if (pathname !== "/login" && auth.isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+        <div className="animate-spin rounded-full size-10 border-b-2 border-primary"></div>
       </div>
     );
   }
 
-  if (!isPublicRoute && (!auth.isAuthenticated || !isAdmin())) {
+  // For protected routes, don't render anything while redirecting
+  if (
+    pathname !== "/login" &&
+    !auth.isLoading &&
+    (!auth.isAuthenticated || !isAdmin())
+  ) {
     return null;
   }
 

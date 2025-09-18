@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { TelegramLogin } from "@/components/telegram-login";
 import { useAuth } from "@/providers/auth-provider";
 import {
@@ -16,20 +14,6 @@ import { AlertCircle } from "lucide-react";
 
 export default function LoginPage() {
   const { auth, isAdmin } = useAuth();
-  const router = useRouter();
-  const [showRoleError, setShowRoleError] = useState(false);
-
-  useEffect(() => {
-    if (auth.isAuthenticated) {
-      if (isAdmin()) {
-        // User is admin, redirect to home
-        router.push("/");
-      } else {
-        // User is not admin, show error and stay on login page
-        setShowRoleError(true);
-      }
-    }
-  }, [auth.isAuthenticated, isAdmin, router]);
 
   if (auth.isLoading) {
     return (
@@ -39,6 +23,9 @@ export default function LoginPage() {
     );
   }
 
+  // Determine if we should show the role error
+  const showRoleError = auth.isAuthenticated && !isAdmin();
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
@@ -47,10 +34,7 @@ export default function LoginPage() {
             Welcome to RiddleRush
           </CardTitle>
           <CardDescription>
-            {auth.isAuthenticated 
-              ? "Authentication successful"
-              : "Sign in with your Telegram account to access the platform"
-            }
+            Sign in with your Telegram account to access the admin platform
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -59,18 +43,12 @@ export default function LoginPage() {
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>Access Denied</AlertTitle>
               <AlertDescription>
-               You do not have the necessary permissions to access this platform.
+                You do not have admin permissions to access this platform.
               </AlertDescription>
             </Alert>
           )}
-          
-          {auth.isAuthenticated ? (
-            <div className="text-center space-y-4">
-              <div className="text-sm text-muted-foreground">
-                Logged in as: <strong>{auth.user?.first_name} (@{auth.user?.username})</strong>
-              </div>
-            </div>
-          ) : (
+
+          {!auth.isAuthenticated ? (
             <div className="text-center">
               <TelegramLogin
                 botName={
@@ -81,11 +59,27 @@ export default function LoginPage() {
                 cornerRadius={8}
               />
             </div>
+          ) : (
+            <div className="text-center space-y-4">
+              <div className="text-sm text-muted-foreground">
+                Logged in as:{" "}
+                <strong>
+                  {auth.user?.first_name}{" "}
+                  {auth.user?.username && `(@${auth.user.username})`}
+                </strong>
+                <p>Role: {auth.user?.role}</p>
+              </div>
+              {showRoleError && (
+                <p className="text-sm text-muted-foreground">
+                  Please contact an administrator for access.
+                </p>
+              )}
+            </div>
           )}
-          
+
           <div className="text-xs text-center text-muted-foreground">
             By signing in, you agree to our terms of service and privacy policy.
-            Only authenticated admin users can access RiddleRush campaigns.
+            Only admin users can access the RiddleRush platform.
           </div>
         </CardContent>
       </Card>

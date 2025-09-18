@@ -10,7 +10,6 @@ const AuthContext = createContext<{
   login: (user: TelegramUser) => void;
   logout: () => void;
   isAdmin: () => boolean;
-  requireAdmin: () => boolean;
 } | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -105,24 +104,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return auth.user?.role === "admin";
   };
 
-  const requireAdmin = () => {
-    if (!auth.isAuthenticated || !auth.user) {
-      router.push("/login");
-      return false;
-    }
-
-    if (!isAdmin()) {
-      // Don't show alert, let the login page handle the error display
-      return false;
-    }
-
-    return true;
-  };
-
   return (
-    <AuthContext.Provider
-      value={{ auth, login, logout, isAdmin, requireAdmin }}
-    >
+    <AuthContext.Provider value={{ auth, login, logout, isAdmin }}>
       {children}
     </AuthContext.Provider>
   );
