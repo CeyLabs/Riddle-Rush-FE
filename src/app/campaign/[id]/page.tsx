@@ -1,5 +1,3 @@
-"use client";
-
 import { Navbar } from "@/components/layout/navbar";
 import { CampaignHeader } from "@/components/campaign-header";
 import { QuestionList } from "@/components/question-list";
