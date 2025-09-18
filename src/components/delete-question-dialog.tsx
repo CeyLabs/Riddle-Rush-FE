@@ -38,6 +38,7 @@ export function DeleteQuestionDialog({
   const handleDeleteQuestion = (question: Question) => {
     deleteRiddleMutation.mutate({
       riddleId: question.id,
+      campaignId: question.campaign_id,
     });
   };
 

@@ -146,7 +146,13 @@ export function useDeleteRiddle() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ riddleId }: { riddleId: string }) => {
+    mutationFn: async ({
+      riddleId,
+      campaignId,
+    }: {
+      riddleId: string;
+      campaignId: string;
+    }) => {
       const response = await fetch(`${API_BASE_URL}/riddles/${riddleId}`, {
         method: "DELETE",
       });
@@ -156,12 +162,21 @@ export function useDeleteRiddle() {
         throw new Error(errorData.message || "Failed to delete riddle");
       }
 
-      return { riddleId };
+      return { riddleId, campaignId };
     },
     onSuccess: (data) => {
+      // Optimistically remove the deleted riddle from cache
+      queryClient.setQueryData(
+        ["riddles", data.campaignId],
+        (old: Riddle[] | undefined) => {
+          if (!old) return old;
+          return old.filter((riddle) => riddle.id !== data.riddleId);
+        }
+      );
+
       // Invalidate and refetch riddles list for this campaign
       queryClient.invalidateQueries({
-        queryKey: ["riddles", data.riddleId],
+        queryKey: ["riddles", data.campaignId],
       });
       toast.success("Riddle deleted successfully", {
         description: "The riddle has been removed from the campaign.",
