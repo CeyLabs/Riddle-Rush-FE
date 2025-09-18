@@ -80,22 +80,12 @@ export function QuestionList({ campaignId }: QuestionListProps) {
         </div>
         <h3 className="text-xl font-semibold mb-2">Failed to load questions</h3>
         <p className="text-muted-foreground mb-4">
-          {error.message || "Something went wrong while fetching questions."}
+          {error instanceof Error ? error.message : "Something went wrong while fetching questions."}
         </p>
         <Button onClick={() => refetch()}>Try Again</Button>
       </div>
     );
   }
-
-  const formatDateTime = (dateString: string) => {
-    const date = new Date(dateString);
-    const formattedDate = formatDate(dateString);
-    const time = date.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    return `${formattedDate} at ${time}`;
-  };
 
   const QuestionSkeleton = () => (
     <Card>

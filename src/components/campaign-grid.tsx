@@ -143,7 +143,7 @@ export function CampaignGrid() {
         </div>
         <h3 className="text-xl font-semibold mb-2">Failed to load campaigns</h3>
         <p className="text-muted-foreground mb-4">
-          {error.message || "Something went wrong while fetching campaigns."}
+          {error instanceof Error ? error.message : "Something went wrong while fetching campaigns."}
         </p>
         <Button onClick={() => refetch()}>Try Again</Button>
       </div>

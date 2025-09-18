@@ -46,7 +46,7 @@ export function useAllCampaigns() {
 }
 
 export function useCampaignRiddles(campaignId: string) {
-  return useQuery({
+  return useQuery<Riddle[], Error>({
     queryKey: ["riddles", campaignId],
     queryFn: async (): Promise<Riddle[]> => {
       const response = await fetch(
