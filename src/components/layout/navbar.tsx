@@ -33,6 +33,10 @@ export function Navbar() {
             <Popover>
               <PopoverTrigger asChild>
                 <Avatar className="size-8 rounded-md">
+                  <AvatarImage
+                    src={auth.user?.photo_url}
+                    alt={auth.user?.first_name || "User"}
+                  />
                   <AvatarFallback>
                     <User className="size-5" />
                   </AvatarFallback>
@@ -41,6 +45,10 @@ export function Navbar() {
               <PopoverContent className="w-64 p-0" align="end">
                 <div className="flex items-center space-x-3 p-4 border-b">
                   <Avatar className="size-12 rounded-md">
+                    <AvatarImage
+                      src={auth.user?.photo_url}
+                      alt={auth.user?.first_name || "User"}
+                    />
                     <AvatarFallback>
                       <User className="size-6" />
                     </AvatarFallback>

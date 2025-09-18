@@ -10,7 +10,8 @@ export interface AuthResponse {
     telegram_id: number;
     first_name: string;
     username?: string;
-    role: UserRole
+    photo_url?: string;
+    role: UserRole;
   };
   message?: string;
 }

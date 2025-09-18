@@ -13,7 +13,6 @@ const AuthContext = createContext<{
 } | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
   const [auth, setAuth] = useState<AuthState>({
     user: null,
     isAuthenticated: false,
@@ -65,12 +64,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Store auth token
         localStorage.setItem("auth_token", authResponse.access_token);
 
-        // Store user data (the backend user with role)
-        const userData = JSON.stringify(authResponse.user);
+        // Combine backend user data with Telegram photo URL
+        const userWithPhoto = {
+          ...authResponse.user,
+          photo_url: user.photo_url, // Use Telegram photo URL
+        };
+
+        // Store combined user data
+        const userData = JSON.stringify(userWithPhoto);
         localStorage.setItem("user", userData);
 
         setAuth({
-          user: authResponse.user,
+          user: userWithPhoto,
           isAuthenticated: true,
           isLoading: false,
         });
