@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-const API_BASE_URL = "http://localhost:3000/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
 type SupportedLanguages = "en" | "ar";
 
