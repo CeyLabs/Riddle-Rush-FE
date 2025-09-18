@@ -24,7 +24,6 @@ import {
   List,
 } from "lucide-react";
 import { CreateCampaignDialog } from "@/components/create-campaign-dialog";
-import { useAppStore } from "@/lib/store";
 import { formatDate, getStatusColor, getStatusTextColor } from "@/lib/utils";
 import { useAllCampaigns } from "@/hooks/query-hooks";
 import Link from "next/link";
@@ -32,9 +31,8 @@ import Link from "next/link";
 export function CampaignGrid() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const { data: campaigns = [], isLoading, error } = useAllCampaigns();
-  const viewMode = useAppStore((state) => state.viewMode);
-  const setViewMode = useAppStore((state) => state.setViewMode);
 
   const filteredCampaigns = campaigns.filter((campaign) =>
     campaign.name.toLowerCase().includes(searchTerm.toLowerCase())

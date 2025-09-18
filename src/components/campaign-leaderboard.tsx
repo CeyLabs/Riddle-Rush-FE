@@ -8,19 +8,17 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Trophy, Clock, Calendar } from "lucide-react";
-import { useAppStore } from "@/lib/store";
 import { formatDate, formatTime } from "@/lib/utils";
-import { getRankIcon, getScoreColor } from "@/lib/utils"; // Added imports for getRankIcon and getScoreColor
+import { getRankIcon, getScoreColor } from "@/lib/utils";
 
 interface CampaignLeaderboardProps {
   campaignId: string;
 }
 
 export function CampaignLeaderboard({ campaignId }: CampaignLeaderboardProps) {
-  const getCampaignLeaderboard = useAppStore(
-    (state) => state.getCampaignLeaderboard,
-  );
-  const leaderboard = getCampaignLeaderboard(campaignId);
+  // For now, return empty leaderboard since we removed the Zustand store
+  // This can be replaced with an API call or other data fetching mechanism
+  const leaderboard: any[] = [];
 
   if (leaderboard.length === 0) {
     return (
