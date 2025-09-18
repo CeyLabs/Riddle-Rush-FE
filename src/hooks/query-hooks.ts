@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-
-const API_BASE_URL = "http://localhost:3344/api";
+import { makeAuthenticatedRequest } from "@/services/auth";
 
 type SupportedLanguages = "en" | "ar";
 
@@ -36,7 +35,7 @@ export function useAllCampaigns() {
   return useQuery({
     queryKey: ["campaigns"],
     queryFn: async (): Promise<Campaign[]> => {
-      const response = await fetch(`${API_BASE_URL}/campaigns`);
+      const response = await makeAuthenticatedRequest("/campaigns");
       if (!response.ok) {
         throw new Error("Failed to fetch campaigns");
       }
@@ -49,8 +48,8 @@ export function useCampaignRiddles(campaignId: string) {
   return useQuery<Riddle[], Error>({
     queryKey: ["riddles", campaignId],
     queryFn: async (): Promise<Riddle[]> => {
-      const response = await fetch(
-        `${API_BASE_URL}/campaigns/${campaignId}/riddles`,
+      const response = await makeAuthenticatedRequest(
+        `/campaigns/${campaignId}/riddles`,
       );
       if (!response.ok) {
         throw new Error("Failed to fetch riddles");
@@ -66,11 +65,8 @@ export function useCreateCampaign() {
 
   return useMutation({
     mutationFn: async (data: Omit<Campaign, "id">) => {
-      const response = await fetch(`${API_BASE_URL}/campaigns`, {
+      const response = await makeAuthenticatedRequest("/campaigns", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify(data),
       });
 
@@ -107,13 +103,10 @@ export function useCreateRiddle() {
       campaignId: string;
       data: Omit<Riddle, "id" | "campaign_id">;
     }) => {
-      const response = await fetch(
-        `${API_BASE_URL}/campaigns/${campaignId}/riddles`,
+      const response = await makeAuthenticatedRequest(
+        `/campaigns/${campaignId}/riddles`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
           body: JSON.stringify(data),
         },
       );
@@ -153,7 +146,7 @@ export function useDeleteRiddle() {
       riddleId: string;
       campaignId: string;
     }) => {
-      const response = await fetch(`${API_BASE_URL}/riddles/${riddleId}`, {
+      const response = await makeAuthenticatedRequest(`/riddles/${riddleId}`, {
         method: "DELETE",
       });
 
@@ -203,11 +196,8 @@ export function useUpdateRiddle() {
       campaignId: string;
       data: Partial<Omit<Riddle, "id" | "campaign_id">>;
     }) => {
-      const response = await fetch(`${API_BASE_URL}/riddles/${riddleId}`, {
+      const response = await makeAuthenticatedRequest(`/riddles/${riddleId}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify(data),
       });
 
@@ -239,8 +229,8 @@ export function useCampaignLeaderboard(campaignId: string) {
   return useQuery({
     queryKey: ["leaderboard", campaignId],
     queryFn: async (): Promise<LeaderboardEntry[]> => {
-      const response = await fetch(
-        `${API_BASE_URL}/campaigns/${campaignId}/leaderboard?limit=10`,
+      const response = await makeAuthenticatedRequest(
+        `/campaigns/${campaignId}/leaderboard?limit=10`,
       );
       if (!response.ok) {
         throw new Error("Failed to fetch leaderboard");
