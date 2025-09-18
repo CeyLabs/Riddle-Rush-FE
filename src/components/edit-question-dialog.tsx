@@ -90,7 +90,7 @@ export function EditQuestionDialog({
           reset();
           onOpenChange(false);
         },
-      }
+      },
     );
   };
 

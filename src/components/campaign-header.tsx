@@ -28,7 +28,7 @@ export function CampaignHeader({ campaign }: CampaignHeaderProps) {
             <Badge
               variant="secondary"
               className={`${getStatusColor(
-                campaign.status
+                campaign.status,
               )} ${getStatusTextColor(campaign.status)}`}
             >
               {campaign.status}

@@ -79,7 +79,7 @@ export function AddQuestionDialog({
           // Call optional callback if provided
           onAddQuestion?.(data);
         },
-      }
+      },
     );
   };
 

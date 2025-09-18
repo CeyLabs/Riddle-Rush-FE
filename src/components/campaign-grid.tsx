@@ -34,7 +34,7 @@ export function CampaignGrid() {
   const { data: campaigns = [], isLoading, error, refetch } = useAllCampaigns();
 
   const filteredCampaigns = campaigns.filter((campaign) =>
-    campaign.name.toLowerCase().includes(searchTerm.toLowerCase())
+    campaign.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const getDisplayStatus = (isActive: boolean) =>
@@ -51,7 +51,7 @@ export function CampaignGrid() {
       "web3",
     ];
     return blockchainKeywords.some((keyword) =>
-      name.toLowerCase().includes(keyword)
+      name.toLowerCase().includes(keyword),
     );
   };
 
@@ -142,7 +142,9 @@ export function CampaignGrid() {
         </div>
         <h3 className="text-xl font-semibold mb-2">Failed to load campaigns</h3>
         <p className="text-muted-foreground mb-4">
-          {error instanceof Error ? error.message : "Something went wrong while fetching campaigns."}
+          {error instanceof Error
+            ? error.message
+            : "Something went wrong while fetching campaigns."}
         </p>
         <Button onClick={() => refetch()}>Try Again</Button>
       </div>
@@ -225,9 +227,9 @@ export function CampaignGrid() {
                     <Badge
                       variant="secondary"
                       className={`${getStatusColor(
-                        getDisplayStatus(campaign.is_active)
+                        getDisplayStatus(campaign.is_active),
                       )} ${getStatusTextColor(
-                        getDisplayStatus(campaign.is_active)
+                        getDisplayStatus(campaign.is_active),
                       )} transition-colors duration-200`}
                     >
                       {getDisplayStatus(campaign.is_active)}
@@ -293,9 +295,9 @@ export function CampaignGrid() {
                     <Badge
                       variant="secondary"
                       className={`${getStatusColor(
-                        getDisplayStatus(campaign.is_active)
+                        getDisplayStatus(campaign.is_active),
                       )} ${getStatusTextColor(
-                        getDisplayStatus(campaign.is_active)
+                        getDisplayStatus(campaign.is_active),
                       )} transition-colors duration-200`}
                     >
                       {getDisplayStatus(campaign.is_active)}

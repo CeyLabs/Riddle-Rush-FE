@@ -33,10 +33,10 @@ export function DateTimePicker({
 }: DateTimePickerProps) {
   const [open, setOpen] = React.useState(false);
   const [date, setDate] = React.useState<Date | undefined>(
-    value ? new Date(value) : undefined
+    value ? new Date(value) : undefined,
   );
   const [time, setTime] = React.useState(
-    value ? format(new Date(value), "HH:mm") : "09:00"
+    value ? format(new Date(value), "HH:mm") : "09:00",
   );
 
   const today = new Date();
@@ -72,7 +72,7 @@ export function DateTimePicker({
             variant={"outline"}
             className={cn(
               "w-full justify-start text-left font-normal",
-              !date && "text-muted-foreground"
+              !date && "text-muted-foreground",
             )}
             disabled={disabled}
           >

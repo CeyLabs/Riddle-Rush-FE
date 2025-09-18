@@ -37,7 +37,7 @@ export const questionSchema = z
     {
       message: "Answer length is invalid for the selected type",
       path: ["answer"],
-    }
+    },
   )
   .refine(
     (data) => {
@@ -48,7 +48,7 @@ export const questionSchema = z
     {
       message: "End time must be after start time",
       path: ["endTime"],
-    }
+    },
   )
   .refine(
     (data) => {
@@ -59,7 +59,7 @@ export const questionSchema = z
     {
       message: "Start time must be in the future",
       path: ["startTime"],
-    }
+    },
   );
 
 export type CampaignFormData = z.infer<typeof campaignSchema>;

@@ -50,7 +50,7 @@ export function useCampaignRiddles(campaignId: string) {
     queryKey: ["riddles", campaignId],
     queryFn: async (): Promise<Riddle[]> => {
       const response = await fetch(
-        `${API_BASE_URL}/campaigns/${campaignId}/riddles`
+        `${API_BASE_URL}/campaigns/${campaignId}/riddles`,
       );
       if (!response.ok) {
         throw new Error("Failed to fetch riddles");
@@ -115,7 +115,7 @@ export function useCreateRiddle() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(data),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -171,7 +171,7 @@ export function useDeleteRiddle() {
         (old: Riddle[] | undefined) => {
           if (!old) return old;
           return old.filter((riddle) => riddle.id !== data.riddleId);
-        }
+        },
       );
 
       // Invalidate and refetch riddles list for this campaign
@@ -240,7 +240,7 @@ export function useCampaignLeaderboard(campaignId: string) {
     queryKey: ["leaderboard", campaignId],
     queryFn: async (): Promise<LeaderboardEntry[]> => {
       const response = await fetch(
-        `${API_BASE_URL}/campaigns/${campaignId}/leaderboard?limit=10`
+        `${API_BASE_URL}/campaigns/${campaignId}/leaderboard?limit=10`,
       );
       if (!response.ok) {
         throw new Error("Failed to fetch leaderboard");

@@ -30,7 +30,7 @@ export function QuestionList({ campaignId }: QuestionListProps) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [deletingQuestion, setDeletingQuestion] = useState<Question | null>(
-    null
+    null,
   );
 
   const {
@@ -43,7 +43,7 @@ export function QuestionList({ campaignId }: QuestionListProps) {
   const getStatusIcon = (
     isActive: boolean,
     startDate: string,
-    endDate: string
+    endDate: string,
   ) => {
     const now = new Date();
     const start = new Date(startDate);
@@ -80,7 +80,9 @@ export function QuestionList({ campaignId }: QuestionListProps) {
         </div>
         <h3 className="text-xl font-semibold mb-2">Failed to load questions</h3>
         <p className="text-muted-foreground mb-4">
-          {error instanceof Error ? error.message : "Something went wrong while fetching questions."}
+          {error instanceof Error
+            ? error.message
+            : "Something went wrong while fetching questions."}
         </p>
         <Button onClick={() => refetch()}>Try Again</Button>
       </div>
@@ -210,25 +212,25 @@ export function QuestionList({ campaignId }: QuestionListProps) {
                         className={`${getStatusColor(
                           getQuestionStatus(
                             question.start_date,
-                            question.end_date
-                          )
+                            question.end_date,
+                          ),
                         )} ${getStatusTextColor(
                           getQuestionStatus(
                             question.start_date,
-                            question.end_date
-                          )
+                            question.end_date,
+                          ),
                         )} text-xs transition-colors duration-200`}
                       >
                         <span className="flex items-center space-x-1">
                           {getStatusIcon(
                             question.is_answer_static,
                             question.start_date,
-                            question.end_date
+                            question.end_date,
                           )}
                           <span className="capitalize">
                             {getQuestionStatus(
                               question.start_date,
-                              question.end_date
+                              question.end_date,
                             )}
                           </span>
                         </span>
