@@ -13,7 +13,7 @@ interface Campaign {
   is_active: boolean;
 }
 
-interface Riddle {
+export interface Riddle {
   id: string;
   campaign_id: string;
   question: string;

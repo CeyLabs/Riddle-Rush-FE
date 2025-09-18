@@ -19,17 +19,8 @@ import { DeleteQuestionDialog } from "@/components/delete-question-dialog";
 import { formatDate, getStatusColor, getStatusTextColor } from "@/lib/utils";
 import {
   useCampaignRiddles,
+  type Riddle as Question,
 } from "@/hooks/query-hooks";
-
-interface Question {
-  id: string;
-  campaign_id: string;
-  question: string;
-  answer: string;
-  is_answer_static: boolean;
-  start_date: string;
-  end_date: string;
-}
 
 interface QuestionListProps {
   campaignId: string;
@@ -45,10 +36,9 @@ export function QuestionList({ campaignId }: QuestionListProps) {
   const {
     data: questions = [],
     isLoading,
-    error, refetch
+    error,
+    refetch,
   } = useCampaignRiddles(campaignId);
-
-
 
   const getStatusIcon = (
     isActive: boolean,
@@ -81,8 +71,6 @@ export function QuestionList({ campaignId }: QuestionListProps) {
       return "ended";
     }
   };
-
-
 
   if (error) {
     return (
