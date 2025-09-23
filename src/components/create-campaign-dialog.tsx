@@ -56,7 +56,6 @@ export function CreateCampaignDialog({
       name: data.name,
       description: data.description,
       language: data.language,
-      is_active: true,
     };
 
     createCampaignMutation.mutate(payload, {
@@ -82,12 +81,13 @@ export function CreateCampaignDialog({
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-8">
-            <div>
+            <div className="space-y-1">
               <Label htmlFor="name" className="text-sm font-medium">
                 Campaign Name
               </Label>
               <Input
                 id="name"
+                type="text"
                 placeholder="Enter campaign name..."
                 {...register("name")}
                 className={`transition-all duration-200 ${
@@ -102,7 +102,7 @@ export function CreateCampaignDialog({
                 </p>
               )}
             </div>
-            <div>
+            <div className="space-y-1">
               <Label htmlFor="description" className="text-sm font-medium">
                 Description (Optional)
               </Label>
@@ -122,7 +122,7 @@ export function CreateCampaignDialog({
                 </p>
               )}
             </div>
-            <div>
+            <div className="space-y-1">
               <Label htmlFor="language" className="text-sm font-medium">
                 Language
               </Label>

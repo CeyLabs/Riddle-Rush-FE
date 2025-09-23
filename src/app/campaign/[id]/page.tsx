@@ -1,40 +1,56 @@
+"use client";
+
 import { Navbar } from "@/components/layout/navbar";
-import { CampaignHeader } from "@/components/campaign-header";
 import { QuestionList } from "@/components/question-list";
 import { CampaignLeaderboard } from "@/components/campaign-leaderboard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Suspense } from "react";
+import { Suspense, use } from "react";
+import { useCampaign } from "@/hooks/query-hooks";
 
-const getCampaign = (id: string) => ({
-  id,
-  name:
-    id === "1"
-      ? "Math Riddles Challenge"
-      : id === "2"
-        ? "Logic Puzzles"
-        : id === "4"
-          ? "Blockchain & Crypto Quiz"
-          : "New Campaign",
-  createdAt: "2024-01-15",
-  status: "active" as const,
-  description:
-    "A collection of challenging riddles to test your problem-solving skills",
-});
-
-// Use Next.js PageProps for dynamic route typing
-export default async function CampaignPage({
+export default function CampaignPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
-  const campaign = getCampaign(id);
+  const { id } = use(params);
+  const { data: campaign, isLoading, error } = useCampaign(id);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="container mx-auto px-4 py-8">
+          <div>Loading campaign...</div>
+        </main>
+      </div>
+    );
+  }
+
+  if (error || !campaign) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="container mx-auto px-4 py-8">
+          <div>Failed to load campaign</div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="container mx-auto px-4 py-8">
-        <CampaignHeader campaign={campaign} />
+        <div className="mb-8 space-x-4">
+          <h1 className="text-3xl font-bold text-foreground">
+            {campaign.name}
+          </h1>
+          {campaign.description && (
+            <p className="text-muted-foreground text-lg max-w-2xl">
+              {campaign.description}
+            </p>
+          )}
+        </div>
 
         <Tabs defaultValue="questions" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-8">

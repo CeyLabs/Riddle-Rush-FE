@@ -16,7 +16,11 @@ import {
 import { AddQuestionDialog } from "@/components/add-question-dialog";
 import { EditQuestionDialog } from "@/components/edit-question-dialog";
 import { DeleteQuestionDialog } from "@/components/delete-question-dialog";
-import { formatDate, getStatusColor, getStatusTextColor } from "@/lib/utils";
+import {
+  formatDateTime,
+  isQuestionEditable,
+  getQuestionStatus,
+} from "@/lib/utils";
 import {
   useCampaignRiddles,
   type Riddle as Question,
@@ -30,7 +34,7 @@ export function QuestionList({ campaignId }: QuestionListProps) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [deletingQuestion, setDeletingQuestion] = useState<Question | null>(
-    null,
+    null
   );
 
   const {
@@ -40,11 +44,7 @@ export function QuestionList({ campaignId }: QuestionListProps) {
     refetch,
   } = useCampaignRiddles(campaignId);
 
-  const getStatusIcon = (
-    isActive: boolean,
-    startDate: string,
-    endDate: string,
-  ) => {
+  const getStatusIcon = (startDate: string, endDate: string) => {
     const now = new Date();
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -52,23 +52,9 @@ export function QuestionList({ campaignId }: QuestionListProps) {
     if (now < start) {
       return <AlertCircle className="size-4" />; // upcoming
     } else if (now >= start && now <= end) {
-      return <Clock className="size-4" />; // active
+      return <Clock className="size-4" />; // ongoing
     } else {
       return <CheckCircle className="size-4" />; // ended
-    }
-  };
-
-  const getQuestionStatus = (startDate: string, endDate: string) => {
-    const now = new Date();
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-
-    if (now < start) {
-      return "upcoming";
-    } else if (now >= start && now <= end) {
-      return "active";
-    } else {
-      return "ended";
     }
   };
 
@@ -185,7 +171,7 @@ export function QuestionList({ campaignId }: QuestionListProps) {
           {questions.map((question, index) => (
             <Card
               key={question.id}
-              className="hover:shadow-lg transition-all duration-200 hover:scale-[1.01] group gap-3"
+              className="hover:shadow-lg group gap-3"
             >
               <CardHeader className="pb-0">
                 <div className="flex items-start justify-between">
@@ -209,28 +195,17 @@ export function QuestionList({ campaignId }: QuestionListProps) {
                       </Badge>
                       <Badge
                         variant="secondary"
-                        className={`${getStatusColor(
-                          getQuestionStatus(
-                            question.start_date,
-                            question.end_date,
-                          ),
-                        )} ${getStatusTextColor(
-                          getQuestionStatus(
-                            question.start_date,
-                            question.end_date,
-                          ),
-                        )} text-xs transition-colors duration-200`}
+                        className="text-xs transition-colors duration-200"
                       >
                         <span className="flex items-center space-x-1">
                           {getStatusIcon(
-                            question.is_answer_static,
                             question.start_date,
-                            question.end_date,
+                            question.end_date
                           )}
                           <span className="capitalize">
                             {getQuestionStatus(
                               question.start_date,
-                              question.end_date,
+                              question.end_date
                             )}
                           </span>
                         </span>
@@ -242,7 +217,31 @@ export function QuestionList({ campaignId }: QuestionListProps) {
                       variant="ghost"
                       size="sm"
                       onClick={() => setEditingQuestion(question)}
-                      className="h-8 w-8 p-0 hover:bg-primary/10 hover:text-primary transition-all duration-200"
+                      disabled={
+                        !isQuestionEditable(
+                          question.start_date,
+                          question.end_date
+                        )
+                      }
+                      className={`h-8 w-8 p-0 transition-all duration-200 ${
+                        !isQuestionEditable(
+                          question.start_date,
+                          question.end_date
+                        )
+                          ? "text-muted-foreground cursor-not-allowed opacity-50"
+                          : "hover:bg-primary/10 hover:text-primary"
+                      }`}
+                      title={
+                        !isQuestionEditable(
+                          question.start_date,
+                          question.end_date
+                        )
+                          ? `Cannot edit ${getQuestionStatus(
+                              question.start_date,
+                              question.end_date
+                            )} questions`
+                          : "Edit question"
+                      }
                     >
                       <Edit className="size-4" />
                     </Button>
@@ -250,7 +249,31 @@ export function QuestionList({ campaignId }: QuestionListProps) {
                       variant="ghost"
                       size="sm"
                       onClick={() => setDeletingQuestion(question)}
-                      className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10 transition-all duration-200"
+                      disabled={
+                        !isQuestionEditable(
+                          question.start_date,
+                          question.end_date
+                        )
+                      }
+                      className={`h-8 w-8 p-0 transition-all duration-200 ${
+                        !isQuestionEditable(
+                          question.start_date,
+                          question.end_date
+                        )
+                          ? "text-muted-foreground cursor-not-allowed opacity-50"
+                          : "text-destructive hover:text-destructive hover:bg-destructive/10"
+                      }`}
+                      title={
+                        !isQuestionEditable(
+                          question.start_date,
+                          question.end_date
+                        )
+                          ? `Cannot delete ${getQuestionStatus(
+                              question.start_date,
+                              question.end_date
+                            )} questions`
+                          : "Delete question"
+                      }
                     >
                       <Trash2 className="size-4" />
                     </Button>
@@ -261,21 +284,23 @@ export function QuestionList({ campaignId }: QuestionListProps) {
                 <div className="space-y-3">
                   <div className="ml-12">
                     <p className="text-sm font-medium text-foreground mb-1">
-                      Answer:
+                      {question.is_answer_static ? "Answer" : "Answer Context"}
                     </p>
                     <p className="text-sm text-muted-foreground bg-muted p-3 rounded-lg border-l-4 border-primary/30">
                       {question.answer}
                     </p>
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-muted-foreground ml-12">
-                    <span className="flex items-center space-x-1">
+                    <p className="flex items-center space-x-1">
                       <Clock className="w-3 h-3" />
-                      <span>Start: {formatDate(question.start_date)}</span>
-                    </span>
-                    <span className="flex items-center space-x-1">
+                      <span>Start:&nbsp;
+                        <span className="text-foreground">{formatDateTime(question.start_date)}</span></span>
+                    </p>
+                    <p className="flex items-center space-x-1">
                       <CheckCircle className="w-3 h-3" />
-                      <span>End: {formatDate(question.end_date)}</span>
-                    </span>
+                      <span>End:&nbsp;
+                        <span className="text-foreground">{formatDateTime(question.end_date)}</span></span>
+                    </p>
                   </div>
                 </div>
               </CardContent>
