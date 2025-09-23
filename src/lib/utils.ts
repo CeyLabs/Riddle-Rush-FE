@@ -66,7 +66,7 @@ export function isQuestionEnded(endDate: string): boolean {
 export function getQuestionStatus(
   startDate: string,
   endDate: string
-): "upcoming" | "active" | "ended" {
+): "upcoming" | "ongoing" | "ended" {
   const now = new Date();
   const start = new Date(startDate);
   const end = new Date(endDate);
@@ -74,7 +74,7 @@ export function getQuestionStatus(
   if (now < start) {
     return "upcoming";
   } else if (now >= start && now <= end) {
-    return "active";
+    return "ongoing";
   } else {
     return "ended";
   }

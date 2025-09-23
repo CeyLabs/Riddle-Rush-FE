@@ -92,7 +92,7 @@ export function DeleteQuestionDialog({
                     questionStatus.slice(1)}
                   {questionStatus === "ended" &&
                     ` on ${new Date(question.end_date).toLocaleDateString()}`}
-                  {questionStatus === "active" && " - In Progress"}
+                  {questionStatus === "ongoing" && " - In Progress"}
                 </p>
               </div>
             )}

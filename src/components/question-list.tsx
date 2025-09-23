@@ -56,7 +56,7 @@ export function QuestionList({ campaignId }: QuestionListProps) {
     if (now < start) {
       return <AlertCircle className="size-4" />; // upcoming
     } else if (now >= start && now <= end) {
-      return <Clock className="size-4" />; // active
+      return <Clock className="size-4" />; // ongoing
     } else {
       return <CheckCircle className="size-4" />; // ended
     }
