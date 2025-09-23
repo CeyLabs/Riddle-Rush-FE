@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatDate(dateString: string): string {
+export function formatDateTime(dateString: string): string {
   const date = new Date(dateString);
   const months = [
     "Jan",
@@ -26,8 +26,13 @@ export function formatDate(dateString: string): string {
   const day = date.getDate();
   const month = months[date.getMonth()];
   const year = date.getFullYear();
+  const hours = date.getHours();
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  
+  const hours12 = hours % 12 || 12;
+  const ampm = hours >= 12 ? "PM" : "AM";
 
-  return `${day} ${month} ${year}`;
+  return `${day} ${month} ${year} ${hours12}:${minutes} ${ampm}`;
 }
 
 export function formatTime(seconds: number): string {

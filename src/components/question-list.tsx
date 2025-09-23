@@ -17,7 +17,7 @@ import { AddQuestionDialog } from "@/components/add-question-dialog";
 import { EditQuestionDialog } from "@/components/edit-question-dialog";
 import { DeleteQuestionDialog } from "@/components/delete-question-dialog";
 import {
-  formatDate,
+  formatDateTime,
   isQuestionEditable,
   getQuestionStatus,
 } from "@/lib/utils";
@@ -44,11 +44,7 @@ export function QuestionList({ campaignId }: QuestionListProps) {
     refetch,
   } = useCampaignRiddles(campaignId);
 
-  const getStatusIcon = (
-    isActive: boolean,
-    startDate: string,
-    endDate: string
-  ) => {
+  const getStatusIcon = (startDate: string, endDate: string) => {
     const now = new Date();
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -175,7 +171,7 @@ export function QuestionList({ campaignId }: QuestionListProps) {
           {questions.map((question, index) => (
             <Card
               key={question.id}
-              className="hover:shadow-lg transition-all duration-200 hover:scale-[1.01] group gap-3"
+              className="hover:shadow-lg group gap-3"
             >
               <CardHeader className="pb-0">
                 <div className="flex items-start justify-between">
@@ -203,7 +199,6 @@ export function QuestionList({ campaignId }: QuestionListProps) {
                       >
                         <span className="flex items-center space-x-1">
                           {getStatusIcon(
-                            question.is_answer_static,
                             question.start_date,
                             question.end_date
                           )}
@@ -296,14 +291,16 @@ export function QuestionList({ campaignId }: QuestionListProps) {
                     </p>
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-muted-foreground ml-12">
-                    <span className="flex items-center space-x-1">
+                    <p className="flex items-center space-x-1">
                       <Clock className="w-3 h-3" />
-                      <span>Start: {formatDate(question.start_date)}</span>
-                    </span>
-                    <span className="flex items-center space-x-1">
+                      <span>Start:&nbsp;
+                        <span className="text-foreground">{formatDateTime(question.start_date)}</span></span>
+                    </p>
+                    <p className="flex items-center space-x-1">
                       <CheckCircle className="w-3 h-3" />
-                      <span>End: {formatDate(question.end_date)}</span>
-                    </span>
+                      <span>End:&nbsp;
+                        <span className="text-foreground">{formatDateTime(question.end_date)}</span></span>
+                    </p>
                   </div>
                 </div>
               </CardContent>
