@@ -18,13 +18,12 @@ import {
   Clock,
   FileText,
   Trophy,
-  Bitcoin,
   Grid3X3,
   List,
 } from "lucide-react";
 import { CreateCampaignDialog } from "@/components/create-campaign-dialog";
-import { getStatusColor, getStatusTextColor } from "@/lib/utils";
 import { useAllCampaigns } from "@/hooks/query-hooks";
+import { getLanguageText } from "@/lib/utils";
 import Link from "next/link";
 
 export function CampaignGrid() {
@@ -34,26 +33,8 @@ export function CampaignGrid() {
   const { data: campaigns = [], isLoading, error, refetch } = useAllCampaigns();
 
   const filteredCampaigns = campaigns.filter((campaign) =>
-    campaign.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    campaign.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const getDisplayStatus = (isActive: boolean) =>
-    isActive ? "active" : "draft";
-
-  const isBlockchainProject = (name: string) => {
-    const blockchainKeywords = [
-      "blockchain",
-      "crypto",
-      "bitcoin",
-      "ethereum",
-      "defi",
-      "nft",
-      "web3",
-    ];
-    return blockchainKeywords.some((keyword) =>
-      name.toLowerCase().includes(keyword),
-    );
-  };
 
   const CampaignSkeleton = () => (
     <Card className="h-48">
@@ -220,39 +201,30 @@ export function CampaignGrid() {
                       <CardTitle className="text-lg group-hover:text-primary transition-colors duration-200 line-clamp-2">
                         {campaign.name}
                       </CardTitle>
-                      {isBlockchainProject(campaign.name) && (
-                        <Bitcoin className="size-4 text-primary" />
-                      )}
                     </div>
                     <Badge
                       variant="secondary"
-                      className={`${getStatusColor(
-                        getDisplayStatus(campaign.is_active),
-                      )} ${getStatusTextColor(
-                        getDisplayStatus(campaign.is_active),
-                      )} transition-colors duration-200`}
+                      className="transition-colors duration-200 uppercase"
                     >
-                      {getDisplayStatus(campaign.is_active)}
+                      {campaign.status}
                     </Badge>
                   </div>
                   <CardDescription className="flex items-center space-x-4 text-sm">
-                    <span className="flex items-center space-x-1">
-                      <span className="text-muted-foreground">
-                        Language: {campaign.language.toUpperCase()}
-                      </span>
-                    </span>
                     {campaign.description && (
-                      <span className="text-xs text-muted-foreground line-clamp-2">
+                      <p className="text-xs text-muted-foreground line-clamp-2">
                         {campaign.description}
-                      </span>
+                      </p>
                     )}
+                    <p className="text-muted-foreground">
+                      Language: {getLanguageText(campaign.language)}
+                    </p>
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground flex items-center space-x-1">
                       <FileText className="size-4" />
-                      <span>0 questions</span>
+                      <span>{campaign.question_count} questions</span>
                     </span>
                     <Clock className="size-4 text-muted-foreground group-hover:text-primary transition-colors duration-200" />
                   </div>
@@ -288,28 +260,23 @@ export function CampaignGrid() {
                       <h3 className="text-lg font-semibold group-hover:text-primary transition-colors duration-200">
                         {campaign.name}
                       </h3>
-                      {isBlockchainProject(campaign.name) && (
-                        <Bitcoin className="size-4 text-primary" />
-                      )}
                     </div>
                     <Badge
                       variant="secondary"
-                      className={`${getStatusColor(
-                        getDisplayStatus(campaign.is_active),
-                      )} ${getStatusTextColor(
-                        getDisplayStatus(campaign.is_active),
-                      )} transition-colors duration-200`}
+                      className="transition-colors duration-200 uppercase"
                     >
-                      {getDisplayStatus(campaign.is_active)}
+                      {campaign.status}
                     </Badge>
                   </div>
                   <div className="flex items-center space-x-6 text-sm text-muted-foreground">
                     <span className="flex items-center space-x-1">
-                      <span>Language: {campaign.language.toUpperCase()}</span>
+                      <span>
+                        Language: {getLanguageText(campaign.language)}
+                      </span>
                     </span>
                     <span className="flex items-center space-x-1">
                       <FileText className="size-4" />
-                      <span>0 questions</span>
+                      <span>{campaign.question_count} questions</span>
                     </span>
                     <Trophy className="size-4 group-hover:text-primary transition-colors duration-200" />
                   </div>

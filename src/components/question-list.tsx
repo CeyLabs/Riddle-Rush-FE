@@ -18,8 +18,6 @@ import { EditQuestionDialog } from "@/components/edit-question-dialog";
 import { DeleteQuestionDialog } from "@/components/delete-question-dialog";
 import {
   formatDate,
-  getStatusColor,
-  getStatusTextColor,
   isQuestionEditable,
   getQuestionStatus,
 } from "@/lib/utils";
@@ -201,17 +199,7 @@ export function QuestionList({ campaignId }: QuestionListProps) {
                       </Badge>
                       <Badge
                         variant="secondary"
-                        className={`${getStatusColor(
-                          getQuestionStatus(
-                            question.start_date,
-                            question.end_date
-                          )
-                        )} ${getStatusTextColor(
-                          getQuestionStatus(
-                            question.start_date,
-                            question.end_date
-                          )
-                        )} text-xs transition-colors duration-200`}
+                        className="text-xs transition-colors duration-200"
                       >
                         <span className="flex items-center space-x-1">
                           {getStatusIcon(

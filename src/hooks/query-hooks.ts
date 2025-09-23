@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { makeAuthenticatedRequest } from "@/services/auth";
 
-type SupportedLanguages = "en" | "ar";
+export type SupportedLanguages = "en" | "ar";
 
 interface Campaign {
   id: string;
@@ -10,6 +10,8 @@ interface Campaign {
   description?: string;
   language: SupportedLanguages;
   is_active: boolean;
+  question_count: number;
+  status: "upcoming" | "ongoing" | "ended";
 }
 
 export interface Riddle {
@@ -39,6 +41,20 @@ export function useAllCampaigns() {
       }
       return response.json();
     },
+  });
+}
+
+export function useCampaign(campaignId: string) {
+  return useQuery({
+    queryKey: ["campaign", campaignId],
+    queryFn: async (): Promise<Campaign> => {
+      const response = await makeAuthenticatedRequest(`/campaigns/${campaignId}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch campaign");
+      }
+      return response.json();
+    },
+    enabled: !!campaignId, // Only fetch if campaignId is provided
   });
 }
 
