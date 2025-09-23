@@ -57,6 +57,8 @@ export function CreateCampaignDialog({
       description: data.description,
       language: data.language,
       is_active: true,
+      question_count: 0,
+      status: "upcoming" as const,
     };
 
     createCampaignMutation.mutate(payload, {
