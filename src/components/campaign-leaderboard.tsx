@@ -11,6 +11,7 @@ import { Trophy, Clock, Calendar } from "lucide-react";
 import { formatDate, formatTime } from "@/lib/utils";
 import { getRankIcon, getScoreColor } from "@/lib/utils";
 import { useCampaignLeaderboard } from "@/hooks/query-hooks";
+import Link from "next/link";
 
 interface CampaignLeaderboardProps {
   campaignId: string;
@@ -102,7 +103,7 @@ export function CampaignLeaderboard({ campaignId }: CampaignLeaderboardProps) {
         <div className="space-y-4">
           {leaderboard.map((entry, index) => (
             <div
-              key={entry.id}
+              key={entry.user_id}
               className={`flex items-center justify-between p-3 rounded-lg border transition-colors duration-200 ${
                 index === 0
                   ? "bg-primary/5 border-primary/20"
@@ -114,24 +115,34 @@ export function CampaignLeaderboard({ campaignId }: CampaignLeaderboardProps) {
                   {getRankIcon(index)}
                 </div>
                 <div>
-                  <h4 className="font-semibold">{entry.username}</h4>
+                  <h4 className="font-semibold">
+                    {entry.name} - &nbsp;
+                    <Link className="text-blue-400 hover:text-blue-500"
+                     target="_blank"
+                     href={`https://t.me/${entry.username}`}>
+                      @{entry.username}
+                    </Link>
+                    
+                  </h4>
                   <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                    <span className="flex items-center space-x-1">
+                    {/* <span className="flex items-center space-x-1">
                       <Calendar className="w-3 h-3" />
                       <span>{formatDate(entry.completed_at)}</span>
-                    </span>
-                    <span className="flex items-center space-x-1">
+                    </span> */}
+                    {/* <span className="flex items-center space-x-1">
                       <Clock className="w-3 h-3" />
                       <span>{formatTime(entry.time_spent)}</span>
-                    </span>
+                    </span> */}
                   </div>
                 </div>
               </div>
               <div className="text-right">
                 <div
-                  className={`text-2xl font-bold ${getScoreColor(entry.score)}`}
+                  className={`text-2xl font-bold ${getScoreColor(
+                    entry.total_score
+                  )}`}
                 >
-                  {entry.score}
+                  {entry.total_score}
                 </div>
                 <div className="text-xs text-muted-foreground">points</div>
               </div>

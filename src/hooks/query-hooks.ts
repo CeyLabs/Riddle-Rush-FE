@@ -23,12 +23,10 @@ export interface Riddle {
 }
 
 interface LeaderboardEntry {
-  id: string;
-  campaign_id: string;
+  user_id: string;
+  name: string;
   username: string;
-  score: number;
-  completed_at: string;
-  time_spent: number; // in seconds
+  total_score: number;
 }
 
 export function useAllCampaigns() {
