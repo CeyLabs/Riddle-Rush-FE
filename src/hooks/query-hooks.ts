@@ -9,8 +9,10 @@ interface Campaign {
   name: string;
   description?: string;
   language: SupportedLanguages;
-  is_active: boolean;
-  question_count: number;
+}
+
+interface CampaignAPIData extends Campaign {
+    question_count: number;
   status: "upcoming" | "ongoing" | "ended";
 }
 
@@ -34,7 +36,7 @@ interface LeaderboardEntry {
 export function useAllCampaigns() {
   return useQuery({
     queryKey: ["campaigns"],
-    queryFn: async (): Promise<Campaign[]> => {
+    queryFn: async (): Promise<CampaignAPIData[]> => {
       const response = await makeAuthenticatedRequest("/campaigns");
       if (!response.ok) {
         throw new Error("Failed to fetch campaigns");
@@ -47,7 +49,7 @@ export function useAllCampaigns() {
 export function useCampaign(campaignId: string) {
   return useQuery({
     queryKey: ["campaign", campaignId],
-    queryFn: async (): Promise<Campaign> => {
+    queryFn: async (): Promise<CampaignAPIData> => {
       const response = await makeAuthenticatedRequest(`/campaigns/${campaignId}`);
       if (!response.ok) {
         throw new Error("Failed to fetch campaign");

@@ -90,7 +90,7 @@ export function isQuestionEditable(
 export function getLanguageText(languageCode: SupportedLanguages): string {
   const languageMap: Record<string, string> = {
     en: "English",
-    ar: "العربية",
+    ar: "Arabic",
   };
 
   return languageMap[languageCode.toLowerCase()] || languageCode.toUpperCase();

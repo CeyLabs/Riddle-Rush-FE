@@ -15,9 +15,7 @@ import { Button } from "@/components/ui/button";
 import {
   Plus,
   Search,
-  Clock,
   FileText,
-  Trophy,
   Grid3X3,
   List,
 } from "lucide-react";
@@ -194,39 +192,36 @@ export function CampaignGrid() {
 
           {filteredCampaigns.map((campaign) => (
             <Link key={campaign.id} href={`/campaign/${campaign.id}`}>
-              <Card className="hover:shadow-lg transition-all duration-200 cursor-pointer h-48 group">
-                <CardHeader className="pb-3">
+              <Card className="hover:shadow-lg transition-all duration-200 cursor-pointer h-48 group relative">
+                <Badge
+                  variant="secondary"
+                  className="text-xs capitalize absolute top-1 right-1"
+                >
+                  {campaign.status}
+                </Badge>
+                <CardHeader>
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <CardTitle className="text-lg group-hover:text-primary transition-colors duration-200 line-clamp-2">
-                        {campaign.name}
-                      </CardTitle>
-                    </div>
-                    <Badge
-                      variant="secondary"
-                      className="transition-colors duration-200 uppercase"
-                    >
-                      {campaign.status}
-                    </Badge>
+                    <CardTitle className="text-lg group-hover:text-primary transition-colors duration-200 line-clamp-2">
+                      {campaign.name}
+                    </CardTitle>
                   </div>
-                  <CardDescription className="flex items-center space-x-4 text-sm">
+                  <CardDescription className="space-x-4 text-sm">
                     {campaign.description && (
                       <p className="text-xs text-muted-foreground line-clamp-2">
                         {campaign.description}
                       </p>
                     )}
-                    <p className="text-muted-foreground">
-                      Language: {getLanguageText(campaign.language)}
-                    </p>
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground flex items-center space-x-1">
+                  <div className="text-sm space-y-2">
+                    <p className="text-muted-foreground">
+                      Language: {getLanguageText(campaign.language)}
+                    </p>
+                    <p className="text-muted-foreground flex items-center space-x-1">
                       <FileText className="size-4" />
                       <span>{campaign.question_count} questions</span>
-                    </span>
-                    <Clock className="size-4 text-muted-foreground group-hover:text-primary transition-colors duration-200" />
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -268,7 +263,7 @@ export function CampaignGrid() {
                       {campaign.status}
                     </Badge>
                   </div>
-                  <div className="flex items-center space-x-6 text-sm text-muted-foreground">
+                  <div className="space-x-6 text-sm text-muted-foreground">
                     <span className="flex items-center space-x-1">
                       <span>
                         Language: {getLanguageText(campaign.language)}
@@ -278,7 +273,6 @@ export function CampaignGrid() {
                       <FileText className="size-4" />
                       <span>{campaign.question_count} questions</span>
                     </span>
-                    <Trophy className="size-4 group-hover:text-primary transition-colors duration-200" />
                   </div>
                 </div>
               </Card>
