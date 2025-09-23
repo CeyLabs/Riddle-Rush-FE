@@ -301,7 +301,7 @@ export function QuestionList({ campaignId }: QuestionListProps) {
                 <div className="space-y-3">
                   <div className="ml-12">
                     <p className="text-sm font-medium text-foreground mb-1">
-                      Answer:
+                      {question.is_answer_static ? "Answer" : "Answer Context"}
                     </p>
                     <p className="text-sm text-muted-foreground bg-muted p-3 rounded-lg border-l-4 border-primary/30">
                       {question.answer}
