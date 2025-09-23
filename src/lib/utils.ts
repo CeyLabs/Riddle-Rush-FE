@@ -83,3 +83,34 @@ export function getScoreColor(score: number): string {
   if (score >= 70) return "text-blue-500";
   return "text-muted-foreground";
 }
+
+// Question status utilities
+export function isQuestionEnded(endDate: string): boolean {
+  const now = new Date();
+  const end = new Date(endDate);
+  return now > end;
+}
+
+export function getQuestionStatus(
+  startDate: string,
+  endDate: string
+): "upcoming" | "active" | "ended" {
+  const now = new Date();
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+
+  if (now < start) {
+    return "upcoming";
+  } else if (now >= start && now <= end) {
+    return "active";
+  } else {
+    return "ended";
+  }
+}
+
+export function isQuestionEditable(
+  startDate: string,
+  endDate: string
+): boolean {
+  return getQuestionStatus(startDate, endDate) === "upcoming";
+}
