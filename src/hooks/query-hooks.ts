@@ -33,6 +33,28 @@ interface LeaderboardEntry {
   total_score: number;
 }
 
+export interface CampaignExclusion {
+  id: string;
+  campaign_id: string;
+  user_id: string;
+  excluded_by: string;
+  reason?: string;
+  excluded_at: string;
+}
+
+export interface WinnerAnnouncementResult {
+  winners: LeaderboardEntry[];
+  announcementId: string;
+  totalParticipants: number;
+  excludedCount: number;
+}
+
+export interface AnnounceWinnersPayload {
+  excludedUserIds?: string[];
+  maxWinners?: number;
+  customMessage?: string;
+}
+
 export function useAllCampaigns() {
   return useQuery({
     queryKey: ["campaigns"],
@@ -254,5 +276,188 @@ export function useCampaignLeaderboard(campaignId: string) {
       return response.json();
     },
     enabled: !!campaignId, // Only fetch if campaignId is provided
+  });
+}
+
+// Get campaign exclusions
+export function useCampaignExclusions(campaignId: string) {
+  return useQuery({
+    queryKey: ["exclusions", campaignId],
+    queryFn: async (): Promise<CampaignExclusion[]> => {
+      const response = await makeAuthenticatedRequest(
+        `/campaigns/${campaignId}/exclusions`,
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch exclusions");
+      }
+      return response.json();
+    },
+    enabled: !!campaignId,
+  });
+}
+
+// Get filtered leaderboard with exclusions
+export function useFilteredLeaderboard(
+  campaignId: string,
+  excludedUserIds: string[] = [],
+  limit?: number,
+) {
+  return useQuery({
+    queryKey: ["leaderboard", "filtered", campaignId, excludedUserIds, limit],
+    queryFn: async (): Promise<LeaderboardEntry[]> => {
+      const params = new URLSearchParams();
+      if (excludedUserIds.length > 0) {
+        params.append("excludedUserIds", excludedUserIds.join(","));
+      }
+      if (limit) {
+        params.append("limit", limit.toString());
+      }
+
+      const queryString = params.toString() ? `?${params.toString()}` : "";
+      const response = await makeAuthenticatedRequest(
+        `/campaigns/${campaignId}/leaderboard/filtered${queryString}`,
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch filtered leaderboard");
+      }
+      return response.json();
+    },
+    enabled: !!campaignId,
+  });
+}
+
+// Exclude users from campaign
+export function useExcludeUsers() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      campaignId,
+      excludedUserIds,
+      reason,
+    }: {
+      campaignId: string;
+      excludedUserIds: string[];
+      reason?: string;
+    }) => {
+      const response = await makeAuthenticatedRequest(
+        `/campaigns/${campaignId}/exclusions`,
+        {
+          method: "POST",
+          body: JSON.stringify({ excludedUserIds, reason }),
+        },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to exclude users");
+      }
+
+      return response.json();
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["exclusions", variables.campaignId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["leaderboard", "filtered", variables.campaignId],
+      });
+      toast.success("Users excluded successfully", {
+        description: `${variables.excludedUserIds.length} user(s) have been excluded from the campaign.`,
+      });
+    },
+    onError: (error) => {
+      toast.error("Error excluding users", {
+        description: error.message || "Something went wrong. Please try again.",
+      });
+    },
+  });
+}
+
+// Remove user exclusion
+export function useRemoveExclusion() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      campaignId,
+      userId,
+    }: {
+      campaignId: string;
+      userId: string;
+    }) => {
+      const response = await makeAuthenticatedRequest(
+        `/campaigns/${campaignId}/exclusions/${userId}`,
+        {
+          method: "DELETE",
+        },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to remove exclusion");
+      }
+
+      return { campaignId, userId };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["exclusions", data.campaignId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["leaderboard", "filtered", data.campaignId],
+      });
+      toast.success("Exclusion removed", {
+        description: "User has been re-included in the campaign.",
+      });
+    },
+    onError: (error) => {
+      toast.error("Error removing exclusion", {
+        description: error.message || "Something went wrong. Please try again.",
+      });
+    },
+  });
+}
+
+// Announce winners
+export function useAnnounceWinners() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      campaignId,
+      payload,
+    }: {
+      campaignId: string;
+      payload: AnnounceWinnersPayload;
+    }) => {
+      const response = await makeAuthenticatedRequest(
+        `/campaigns/${campaignId}/winners/announce`,
+        {
+          method: "POST",
+          body: JSON.stringify(payload),
+        },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to announce winners");
+      }
+
+      return response.json();
+    },
+    onSuccess: (data: WinnerAnnouncementResult, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["exclusions", variables.campaignId],
+      });
+      toast.success("Winners announced successfully!", {
+        description: `${data.winners.length} winner(s) announced out of ${data.totalParticipants} participants.`,
+      });
+    },
+    onError: (error) => {
+      toast.error("Error announcing winners", {
+        description: error.message || "Something went wrong. Please try again.",
+      });
+    },
   });
 }
